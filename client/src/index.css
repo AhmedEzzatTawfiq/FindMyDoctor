@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+    --color-primary: #5f6FFF;
+}
+
+:root {
+    --primary: #5f6FFF;
+}
+
+
+*{
+    font-family: "Outfit", sans-serif;
+}
+
+.no-scrollbar::-webkit-scrollbar{
+    display: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.grid-cols-auto {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+@media (max-width: 640px) {
+    .grid-cols-auto {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+
+nav a.active hr {
+    display: block;
+}
