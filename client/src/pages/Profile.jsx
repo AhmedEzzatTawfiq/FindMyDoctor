@@ -4,7 +4,7 @@ import { assets } from '../assets/assets'
 const Profile = () => {
 
   const [userData, setUserData] = useState({
-    name: "Edward Vincent",
+    name: "",
     image: assets.profile_pic,
     email: 'richardjames@gmail.com',
     phone: '+1  123 456 7890',
@@ -92,4 +92,4 @@ const Profile = () => {
   )
 }
 
-export default Profile
+export default Profile

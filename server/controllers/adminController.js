@@ -3,6 +3,7 @@ import bcrypt from "bcrypt"
 import { v2 as cloudinary } from "cloudinary";
 import doctorModel from "../models/doctorModel.js";
 import jwt from "jsonwebtoken";
+import Doctor from "../models/doctorModel.js";
 
 // Api for adding doctor
 const addDoctor = async (req, res) => {
@@ -60,7 +61,7 @@ const addDoctor = async (req, res) => {
 
 
 
-// Api foe admin login
+// Api for admin login
 const adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -78,6 +79,16 @@ const adminLogin = async (req, res) => {
     } catch (error) {
         console.log(error)
         res.status(400).json({ success: false, message: error.message })
+    }
+}
+
+// Api to get all doctors
+const getAllDoctors = async (req, res) => {
+    try {
+         const {doctor} = await Doctor.f
+    } catch (error) {
+        console.log(error)
+        res.json({success: false, message: error.message})
     }
 }
 

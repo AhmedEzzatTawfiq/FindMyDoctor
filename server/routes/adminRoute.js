@@ -5,7 +5,7 @@ import authAdmin from "../middleware/authAdmin.js";
 
 const adminRouter = express.Router();
 
-adminRouter.post("/add-doctor",authAdmin, upload.single("image"), addDoctor);
-adminRouter.post("/admin-login", adminLogin);
+adminRouter.post("/add-doctor", authAdmin, upload.single("image"), addDoctor);
+adminRouter.post("/login", adminLogin);
 
 export default adminRouter;
