@@ -23,7 +23,7 @@ const userSchema = mongoose.Schema({
         default: "0000000000"
     },
     address: {
-        type: String,
+        type: Object,
         default: { line1: "", line2: "" }
     },
     d_birth: {

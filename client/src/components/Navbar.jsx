@@ -8,12 +8,17 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const [showMenu, setShowMenu] = useState(false);
-  const { token, setToken } = useContext(AppContext)
+  const { token, setToken, userData } = useContext(AppContext)
+
+  const logout = () => {
+    setToken(false)
+    localStorage.removeItem('token')
+  }
 
 
   return (
     <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-[#ADADAD]'>
-      <img onClick={() => navigate('/')} className='w-44 cursor-pointer' src={assets.logo} alt="" />
+      <h1 onClick={() => navigate('/')} className="text-3xl font-bold text-primary drop-shadow-md cursor-pointer">Your Doctor</h1>
       <ul className='hidden md:flex items-start gap-5 font-medium'>
         <NavLink to='/'>
           <li className='py-1'>HOME</li>
@@ -31,22 +36,22 @@ const Navbar = () => {
           <li className='py-1'>CONTACT</li>
           <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
         </NavLink>
-        <button onClick={() => window.open('https://prescripto-admin.vercel.app', '_blank')} className='border px-5 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:bg-gray-50 transition-all'>Admin Panel</button>
+        <button className='border px-5 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:bg-gray-50 transition-all'>Admin Panel</button>
       </ul>
 
 
 
       <div className='flex items-center gap-4 '>
         {
-          token
+          token && userData
             ? <div className='flex items-center gap-2 cursor-pointer group relative'>
-              <img className='w-8 rounded-full' src={assets.profile_pic} alt="" />
+              <img className='w-8 rounded-full' src={userData.image} alt="" />
               <img className='w-2.5' src={assets.dropdown_icon} alt="" />
               <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>
                 <div className='min-w-48 bg-gray-50 rounded flex flex-col gap-4 p-4'>
                   <p onClick={() => navigate('/profile')} className='hover:text-black cursor-pointer'>My Profile</p>
                   <p onClick={() => navigate('/my-appointments')} className='hover:text-black cursor-pointer'>My Appointments</p>
-                  <p onClick={() => setToken(false)} className='hover:text-black cursor-pointer'>Logout</p>
+                  <p onClick={logout} className='hover:text-black cursor-pointer'>Logout</p>
                 </div>
               </div>
             </div>
@@ -57,7 +62,7 @@ const Navbar = () => {
         {/* ---- Mobile Menu ---- */}
         <div className={`md:hidden ${showMenu ? 'fixed w-full' : 'h-0 w-0'} right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}>
           <div className='flex items-center justify-between px-5 py-6'>
-            <img src={assets.logo} className='w-36' alt="" />
+            <h1 className="text-2xl font-bold text-primary drop-shadow-md">Your Doctor</h1>
             <img onClick={() => setShowMenu(false)} src={assets.cross_icon} className='w-7' alt="" />
           </div>
           <ul className='flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium'>
@@ -72,4 +77,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar
+export default Navbar

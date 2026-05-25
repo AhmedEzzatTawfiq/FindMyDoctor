@@ -1,17 +1,17 @@
 import jwt from "jsonwebtoken"
 
-// Doctor Auth
-const authDoctor = async (req, res, next) => {
+// User Auth
+const authUser = async (req, res, next) => {
     try {
-        const {dtoken} = req.headers;
+        const {token} = req.headers;
 
-        if(!dtoken){
+        if(!token){
             return res.status(400).json({success:false, message:"Not authorized"})
         }
 
-        const token_decode = jwt.verify(dtoken, process.env.JWT_SECRET);
+        const token_decode = jwt.verify(token, process.env.JWT_SECRET);
         if (!req.body) req.body = {};
-        req.body.docId = token_decode.id;
+        req.body.userId = token_decode.id
         next();
 
         
@@ -21,4 +21,4 @@ const authDoctor = async (req, res, next) => {
     }
 }
 
-export default authDoctor;
+export default authUser;

@@ -1,26 +1,21 @@
 import mongoose from "mongoose";
-import dns from "node:dns/promises";
 
 
-dns.setServers(['8.8.8.8', '1.1.1.1']);
-
-
-const connectDB = async () => {
-    mongoose.connection.on('connected', () => {
-        console.log("Connected to MongoDB")
-    })
-
-    mongoose.connection.on('error', (error) => {
-        console.log("Error in connecting to MongoDB");
-        console.log(error.message);
-    })
-
+const connectDB = async () => { 
     try {
-        await mongoose.connect(process.env.MONGO_URL);
-    } catch (error) {
-        console.log("Error in connecting to MongoDB");
-        console.log(error.message);
-    }
-};
+        mongoose.connection.on("connected", () => console.log("Database connected"))
+        mongoose.connection.on("disconnected", () => console.log("MongoDB disconnected"))
 
-export default connectDB;
+        await mongoose.connect(`${process.env.MONGO_URL}`, {
+            connectTimeoutMS: 10000,
+            serverSelectionTimeoutMS: 5000, 
+        })
+
+        console.log("MongoDB connection established successfully")
+    } catch (error) {
+        console.error("Failed to connect to MongoDB:", error.message)
+
+    }
+}
+
+export default connectDB

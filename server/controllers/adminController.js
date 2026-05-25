@@ -68,9 +68,9 @@ const adminLogin = async (req, res) => {
 
         //check data
         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign(email+password, process.env.JWT_SECRET)
-            res.send({success:true, token})
-            
+            const token = jwt.sign(email + password, process.env.JWT_SECRET)
+            res.send({ success: true, token })
+
         } else {
             res.status(400).json({ success: false, message: "Invalid credentials" })
         }
@@ -82,14 +82,17 @@ const adminLogin = async (req, res) => {
     }
 }
 
-// Api to get all doctors
+// Api to get all doctors for admin panel
 const getAllDoctors = async (req, res) => {
     try {
-         const {doctor} = await Doctor.f
+
+        const doctors = await doctorModel.find({}).select('-password')
+        res.json({success:true, doctors})
+
     } catch (error) {
         console.log(error)
-        res.json({success: false, message: error.message})
+        res.json({ success: false, message: error.message })
     }
 }
 
-export { addDoctor, adminLogin };
+export { addDoctor, adminLogin, getAllDoctors };

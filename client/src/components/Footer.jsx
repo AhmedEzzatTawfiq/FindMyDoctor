@@ -7,8 +7,8 @@ const Footer = () => {
       <div className='flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm'>
 
         <div>
-          <img className='mb-5 w-40' src={assets.logo} alt="" />
-          <p className='w-full md:w-2/3 text-gray-600 leading-6'>Prescripto is your trusted partner in managing your healthcare needs conveniently and efficiently. Browse through our extensive list of trusted doctors, schedule appointments hassle-free, and take charge of your health today.</p>
+          <h1 className="text-3xl font-bold text-primary drop-shadow-md mb-5">Your Doctor</h1>
+          <p className='w-full md:w-2/3 text-gray-600 leading-6'>Your Doctor is your trusted partner in managing your healthcare needs conveniently and efficiently. Browse through our extensive list of trusted doctors, schedule appointments hassle-free, and take charge of your health today.</p>
         </div>
 
         <div>

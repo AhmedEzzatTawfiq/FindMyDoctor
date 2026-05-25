@@ -11,10 +11,12 @@ import Login from "./pages/Login";
 import MyAppointment from "./pages/MyAppointment";
 import About from "./pages/About";
 import AdminLogin from "./pages/AdminLogin";
+import toast, { Toaster } from 'react-hot-toast';
 
 const App = () => {
   return (
     <div className="mx-4 sm:mx-[10%]">
+      <Toaster />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
