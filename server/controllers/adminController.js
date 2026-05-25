@@ -1,39 +1,138 @@
-import validator from "validator"
-import bcrypt from "bcrypt"
+import validator from "validator";
+import bcrypt from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
 import doctorModel from "../models/doctorModel.js";
 import jwt from "jsonwebtoken";
-import Doctor from "../models/doctorModel.js";
+import streamifier from "streamifier";
 
-// Api for adding doctor
+
+// Helper function for Cloudinary upload
+const streamUpload = (buffer) => {
+
+    return new Promise((resolve, reject) => {
+
+        const stream = cloudinary.uploader.upload_stream(
+            { resource_type: "image" },
+
+            (error, result) => {
+
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            }
+        );
+
+        streamifier
+            .createReadStream(buffer)
+            .pipe(stream);
+    });
+};
+
+
+// API for adding doctor
 const addDoctor = async (req, res) => {
+
     try {
-        const { name, email, password, specialization, experience, about, fees, address, degree } = req.body;
+
+        const {
+            name,
+            email,
+            password,
+            specialization,
+            experience,
+            about,
+            fees,
+            address,
+            degree
+        } = req.body;
+
         const imageFile = req.file;
 
-        //check data
-        if (!name || !email || !password || !specialization || !experience || !about || !fees || !address || !degree || !imageFile) {
-            return res.status(400).json({ success: false, message: "All fields are required" })
+        // Check required fields
+        if (
+            !name ||
+            !email ||
+            !password ||
+            !specialization ||
+            !experience ||
+            !about ||
+            !fees ||
+            !address ||
+            !degree ||
+            !imageFile
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            });
         }
 
-        //validate email
+        // Validate email
         if (!validator.isEmail(email)) {
-            return res.status(400).json({ success: false, message: "Invalid email" })
+
+            return res.status(400).json({
+                success: false,
+                message: "Invalid email"
+            });
         }
 
-        //validate password
+        // Validate password
         if (password.length < 8) {
-            return res.status(400).json({ success: false, message: "Password must be at least 8 characters long" })
+
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 8 characters long"
+            });
         }
 
-        //hashing doctor password
+        // Check if doctor already exists
+        const existingDoctor = await doctorModel.findOne({ email });
+
+        if (existingDoctor) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Doctor already exists"
+            });
+        }
+
+        // Hash password
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt)
 
-        //upload doctor image to cloudinary
-        const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: "image" });
-        const imageUrl = imageUpload.secure_url
+        const hashedPassword = await bcrypt.hash(
+            password,
+            salt
+        );
 
+        // Upload image to Cloudinary
+        const result = await streamUpload(
+            imageFile.buffer
+        );
+
+        const imageUrl = result.secure_url;
+
+        // Safe address parsing
+        let parsedAddress;
+
+        try {
+
+            parsedAddress =
+                typeof address === "string"
+                    ? JSON.parse(address)
+                    : address;
+
+        } catch (error) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Invalid address format"
+            });
+        }
+
+        // Doctor data
         const doctorData = {
             name,
             email,
@@ -42,57 +141,104 @@ const addDoctor = async (req, res) => {
             experience,
             about,
             fees,
-            address: typeof address === 'string' ? JSON.parse(address) : address,
+            address: parsedAddress,
             degree,
             image: imageUrl,
             date: Date.now()
-        }
+        };
 
-        const newDoctor = new doctorModel(doctorData)
-        await newDoctor.save()
+        // Save doctor
+        const newDoctor = new doctorModel(doctorData);
 
-        res.status(200).json({ success: true, message: "Doctor added successfully" })
+        await newDoctor.save();
+
+        res.status(201).json({
+            success: true,
+            message: "Doctor added successfully"
+        });
 
     } catch (error) {
-        console.log(error)
-        res.status(400).json({ success: false, message: error.message })
+
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
-}
+};
 
 
-
-// Api for admin login
+// API for admin login
 const adminLogin = async (req, res) => {
+
     try {
+
         const { email, password } = req.body;
 
-        //check data
-        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign(email + password, process.env.JWT_SECRET)
-            res.send({ success: true, token })
+        // Check credentials
+        if (
+            email === process.env.ADMIN_EMAIL &&
+            password === process.env.ADMIN_PASSWORD
+        ) {
 
-        } else {
-            res.status(400).json({ success: false, message: "Invalid credentials" })
+            const token = jwt.sign(
+                { email },
+                process.env.JWT_SECRET,
+                { expiresIn: "7d" }
+            );
+
+            return res.json({
+                success: true,
+                token
+            });
         }
 
+        res.status(400).json({
+            success: false,
+            message: "Invalid credentials"
+        });
 
     } catch (error) {
-        console.log(error)
-        res.status(400).json({ success: false, message: error.message })
-    }
-}
 
-// Api to get all doctors for admin panel
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// API to get all doctors
 const getAllDoctors = async (req, res) => {
+
     try {
 
-        const doctors = await doctorModel.find({}).select('-password')
-        res.json({success:true, doctors})
+        const doctors = await doctorModel
+            .find({})
+            .select("-password");
+
+        res.json({
+            success: true,
+            doctors
+        });
 
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
-    }
-}
 
-export { addDoctor, adminLogin, getAllDoctors };
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+export {
+    addDoctor,
+    adminLogin,
+    getAllDoctors
+};
