@@ -20,7 +20,7 @@ connectCloudinary();
 //middleware
 app.use(express.json());
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173', 'https://find-your-doctor-ashen.vercel.app'],
+    origin: ['http://localhost:3000', 'http://localhost:5173', 'https://your-doctor-here.vercel.app/'],
     credentials: true
 }))
 
