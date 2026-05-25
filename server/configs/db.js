@@ -6,7 +6,7 @@ const connectDB = async () => {
         mongoose.connection.on("connected", () => console.log("Database connected"))
         mongoose.connection.on("disconnected", () => console.log("MongoDB disconnected"))
 
-        await mongoose.connect(`${process.env.MONGO_URL}`, {
+        await mongoose.connect(`${process.env.MONGO_URI}`, {
             connectTimeoutMS: 10000,
             serverSelectionTimeoutMS: 5000,
         })
