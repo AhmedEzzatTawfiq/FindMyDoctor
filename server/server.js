@@ -19,7 +19,10 @@ connectCloudinary();
 
 //middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174', 'https://find-your-doctor-ashen.vercel.app/'],
+    credentials: true
+}))
 
 //api endpoints
 app.use("/api/admin", adminRouter);
@@ -32,10 +35,9 @@ app.get("/", (req, res) => {
     res.send("Api working")
 })
 
-if (process.env.NODE_ENV !== "production") {
-    app.listen(port, () => {
-        console.log(`Server is running on port ${port}`)
-    })
-}
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`)
+})
 
 export default app;
