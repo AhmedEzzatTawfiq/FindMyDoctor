@@ -19,10 +19,26 @@ connectCloudinary();
 
 //middleware
 app.use(express.json());
+
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://your-doctor-here.vercel.app',
+    process.env.CLIENT_URL,
+    process.env.ADMIN_URL,
+].filter(Boolean);
+
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173', 'https://your-doctor-here.vercel.app/'],
-    credentials: true
-}))
+    origin(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error(`CORS blocked for origin: ${origin}`));
+        }
+    },
+    credentials: true,
+}));
 
 app.use((req, res, next) => {
     res.setHeader('Content-Security-Policy', "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; worker-src 'self' blob:; object-src 'self';")
