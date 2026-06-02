@@ -19,10 +19,38 @@ connectCloudinary();
 
 //middleware
 app.use(express.json());
+
+const stripTrailingSlash = (url) => url?.replace(/\/$/, '') ?? url;
+
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://your-doctor-here.vercel.app',
+    'https://your-doctor-awnftfcbu-ahmed-ezzats-projects.vercel.app',
+    process.env.CLIENT_URL,
+    process.env.ADMIN_URL,
+].map(stripTrailingSlash).filter(Boolean);
+
+const isOriginAllowed = (origin) => {
+    if (!origin) return true;
+    const normalized = stripTrailingSlash(origin);
+    if (allowedOrigins.includes(normalized)) return true;
+    // Any Vercel production or preview deployment (*.vercel.app)
+    return normalized.startsWith('https://') && normalized.endsWith('.vercel.app');
+};
+
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://your-doctor-here.vercel.app', 'https://your-doctor-awnftfcbu-ahmed-ezzats-projects.vercel.app'],
-    credentials: true
-}))
+    origin(origin, callback) {
+        if (isOriginAllowed(origin)) {
+            callback(null, origin || true);
+        } else {
+            console.warn('CORS blocked for origin:', origin);
+            callback(null, false);
+        }
+    },
+    credentials: true,
+}));
 
 app.use((req, res, next) => {
     res.setHeader('Content-Security-Policy', "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; worker-src 'self' blob:; object-src 'self';")
