@@ -14,36 +14,15 @@ dotenv.config({ path: ['.env'] });
 //app config
 const app = express();
 const port = process.env.PORT || 4000;
+connectDB();
+connectCloudinary();
 
 //middleware
 app.use(express.json());
-
-const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'https://your-doctor-here.vercel.app',
-    process.env.CLIENT_URL,
-    process.env.ADMIN_URL,
-].filter(Boolean);
-
-const isOriginAllowed = (origin) => {
-    if (!origin) return true;
-    return allowedOrigins.includes(origin) || origin.endsWith('.vercel.app');
-};
-
 app.use(cors({
-    origin(origin, callback) {
-        if (isOriginAllowed(origin)) {
-            // Pass the origin string so Allow-Origin is set on every response (including 500s)
-            callback(null, origin || true);
-        } else {
-            console.warn('CORS blocked for origin:', origin);
-            callback(null, false);
-        }
-    },
-    credentials: true,
-}));
+    origin: ['http://localhost:5173', 'https://your-doctor-here.vercel.app', 'https://your-doctor-awnftfcbu-ahmed-ezzats-projects.vercel.app'],
+    credentials: true
+}))
 
 app.use((req, res, next) => {
     res.setHeader('Content-Security-Policy', "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; worker-src 'self' blob:; object-src 'self';")
@@ -62,22 +41,10 @@ app.get("/", (req, res) => {
 })
 
 
-const startServer = async () => {
-    try {
-        await connectDB();
-        connectCloudinary();
-
-        if (!process.env.VERCEL) {
-            app.listen(port, () => {
-                console.log(`Server is running on port ${port}`);
-            });
-        }
-    } catch (error) {
-        console.error("Server failed to start:", error.message);
-        process.exit(1);
-    }
-};
-
-startServer();
+if (!process.env.VERCEL) {
+    app.listen(port, () => {
+        console.log(`Server is running on port ${port}`)
+    })
+}
 
 export default app;
