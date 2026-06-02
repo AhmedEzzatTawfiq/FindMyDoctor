@@ -14,8 +14,6 @@ dotenv.config({ path: ['.env'] });
 //app config
 const app = express();
 const port = process.env.PORT || 4000;
-connectDB();
-connectCloudinary();
 
 //middleware
 app.use(express.json());
@@ -29,12 +27,19 @@ const allowedOrigins = [
     process.env.ADMIN_URL,
 ].filter(Boolean);
 
+const isOriginAllowed = (origin) => {
+    if (!origin) return true;
+    return allowedOrigins.includes(origin) || origin.endsWith('.vercel.app');
+};
+
 app.use(cors({
     origin(origin, callback) {
-        if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
-            callback(null, true);
+        if (isOriginAllowed(origin)) {
+            // Pass the origin string so Allow-Origin is set on every response (including 500s)
+            callback(null, origin || true);
         } else {
-            callback(new Error(`CORS blocked for origin: ${origin}`));
+            console.warn('CORS blocked for origin:', origin);
+            callback(null, false);
         }
     },
     credentials: true,
@@ -57,10 +62,22 @@ app.get("/", (req, res) => {
 })
 
 
-if (!process.env.VERCEL) {
-    app.listen(port, () => {
-        console.log(`Server is running on port ${port}`)
-    })
-}
+const startServer = async () => {
+    try {
+        await connectDB();
+        connectCloudinary();
+
+        if (!process.env.VERCEL) {
+            app.listen(port, () => {
+                console.log(`Server is running on port ${port}`);
+            });
+        }
+    } catch (error) {
+        console.error("Server failed to start:", error.message);
+        process.exit(1);
+    }
+};
+
+startServer();
 
 export default app;
