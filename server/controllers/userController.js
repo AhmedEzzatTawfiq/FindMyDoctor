@@ -1,10 +1,10 @@
 import validator from 'validator'
 import bcrypt from 'bcrypt'
-import User from '../models/userModel.js'
+import User from '../models/UserModel.js'
 import jwt from 'jsonwebtoken'
 import { v2 as cloudinary } from "cloudinary";
 import Appointment from '../models/appointmentModel.js'
-import Doctor from '../models/doctorModel.js'
+import Doctor from '../models/DoctorModel.js'
 import axios from 'axios'
 import streamifier from 'streamifier'
 
