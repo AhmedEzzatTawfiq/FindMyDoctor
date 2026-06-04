@@ -5,6 +5,7 @@ import connectCloudinary from "./configs/cloudinary.js";
 import adminRouter from "./routes/adminRoute.js";
 import doctorRouter from "./routes/doctorRoute.js";
 import userRouter from "./routes/userRoute.js"; 
+import crmRouter from "./routes/crmRoute.js";
 
 
 
@@ -69,6 +70,7 @@ app.use((req, res, next) => {
 app.use("/api/admin", adminRouter);
 app.use("/api/doctor", doctorRouter);
 app.use("/api/user", userRouter);
+app.use("/api/crm", crmRouter);
 
 
 
