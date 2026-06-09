@@ -237,8 +237,68 @@ const getAllDoctors = async (req, res) => {
 };
 
 
+// API to get all appointments
+const getAllAppointments = async (req, res) => {
+    try {
+        const appointments = await (await import('../models/appointmentModel.js')).default
+            .find({})
+            .sort({ date: -1 });
+
+        res.json({ success: true, appointments });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+// API to cancel appointment (admin)
+const cancelAppointmentAdmin = async (req, res) => {
+    try {
+        const { appointmentId } = req.body;
+        const Appointment = (await import('../models/appointmentModel.js')).default;
+
+        await Appointment.findByIdAndUpdate(appointmentId, { canceled: true });
+
+        res.json({ success: true, message: 'Appointment cancelled' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+// API to get dashboard summary
+const getDashboardData = async (req, res) => {
+    try {
+        const Appointment = (await import('../models/appointmentModel.js')).default;
+        const User        = (await import('../models/UserModel.js')).default;
+
+        const doctors      = await doctorModel.countDocuments();
+        const appointments = await Appointment.countDocuments();
+        const patients     = await User.countDocuments();
+
+        const latestAppointments = await Appointment
+            .find({})
+            .sort({ date: -1 })
+            .limit(5);
+
+        res.json({
+            success: true,
+            dashData: { doctors, appointments, patients, latestAppointments }
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
 export {
     addDoctor,
     adminLogin,
-    getAllDoctors
+    getAllDoctors,
+    getAllAppointments,
+    cancelAppointmentAdmin,
+    getDashboardData
 };

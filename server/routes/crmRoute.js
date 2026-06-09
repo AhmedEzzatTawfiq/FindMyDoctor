@@ -6,7 +6,8 @@ import {
     addPatient, listPatients, updatePatient, deletePatient,
     addSession, listSessions, updateSession, deleteSession,
     addNote, listNotes, updateNote, deleteNote,
-    exportData, importData, resetAll
+    exportData, importData, resetAll,
+    getCrmStats
 } from "../controllers/crmController.js";
 
 const crmRouter = express.Router();
@@ -27,6 +28,9 @@ crmRouter.post("/staff/delete", deleteStaff);
 crmRouter.post("/clinic/add", addClinic);
 crmRouter.get("/clinic/list", listClinics);
 crmRouter.post("/clinic/update", updateClinic);
+
+// Dashboard stats
+crmRouter.get("/stats", getCrmStats);
 
 // Patient Management
 crmRouter.post("/patient/add", addPatient);

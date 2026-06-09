@@ -19,33 +19,53 @@ const Login = () => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
-    try {
-
-      if (state === 'Sign Up') {
-        const {data} = await axios.post(backendUrl + '/api/user/register', {name, email, password})
-        if (data.success) {
-          localStorage.setItem('token', data.token)
-          setToken(data.token)
-        } else {
-          toast.error(data.message)
-        }
-
-      } else {
-
-        const {data} = await axios.post(backendUrl + '/api/user/login', {email, password})
-        if (data.success) {
-          localStorage.setItem('token', data.token)
-          setToken(data.token)
-        } else {
-          toast.error(data.message)
-        }
-
-      }
-      
-    } catch (error) {
-      toast.error(error.message)
+    if (!backendUrl) {
+      toast.error('Backend URL is not configured. Set VITE_BACKEND_URL in client/.env')
+      return
     }
-    
+
+    if (state === 'Sign Up') {
+      if (!name.trim()) {
+        toast.error('Please enter your full name')
+        return
+      }
+      if (password.length < 8) {
+        toast.error('Password must be at least 8 characters')
+        return
+      }
+    }
+
+    try {
+      if (state === 'Sign Up') {
+        const { data } = await axios.post(backendUrl + '/api/user/register', {
+          name: name.trim(),
+          email: email.trim(),
+          password,
+        })
+        if (data.success) {
+          localStorage.setItem('token', data.token)
+          setToken(data.token)
+          toast.success('Account created successfully')
+        } else {
+          toast.error(data.message)
+        }
+      } else {
+        const { data } = await axios.post(backendUrl + '/api/user/login', {
+          email: email.trim(),
+          password,
+        })
+        if (data.success) {
+          localStorage.setItem('token', data.token)
+          setToken(data.token)
+          toast.success('Logged in successfully')
+        } else {
+          toast.error(data.message)
+        }
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || error.message
+      toast.error(message)
+    }
   }
 
   useEffect(()=>{
@@ -74,7 +94,17 @@ const Login = () => {
         </div>
         <div className='w-full '>
           <p>Password</p>
-          <input className='border border-[#DADADA] rounded w-full p-2 mt-1' type="password" onChange={(e) => setPassword(e.target.value)} value={password} required />
+          <input
+            className='border border-[#DADADA] rounded w-full p-2 mt-1'
+            type="password"
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            minLength={state === 'Sign Up' ? 8 : undefined}
+            required
+          />
+          {state === 'Sign Up' && (
+            <p className='text-xs text-gray-400 mt-1'>Minimum 8 characters</p>
+          )}
         </div>
         <button type='submit' className='bg-primary text-white w-full py-2 rounded-md text-base'>{state === 'Sign Up' ? 'Create account' : 'Login'}</button>
         {
