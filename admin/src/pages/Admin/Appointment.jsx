@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from 'react'
 import { AdminContext } from '../../context/AdminContext'
-import { assets } from '../../assets/assets'
+import { User, Trash2 } from 'lucide-react'
 
 const Appointment = () => {
-  const { aToken, appointments, getAllAppointments, cancelAppointment } = useContext(AdminContext)
+  const { aToken, appointments, getAllAppointments, deleteAppointment } = useContext(AdminContext)
 
   useEffect(() => {
     if (aToken) getAllAppointments()
@@ -42,11 +42,17 @@ const Appointment = () => {
 
               {/* Patient */}
               <div className="flex items-center gap-2">
-                <img
-                  src={item.userData?.image || assets.patients_icon}
-                  alt=""
-                  className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                />
+                {item.userData?.image ? (
+                  <img
+                    src={item.userData.image}
+                    alt=""
+                    className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                    <User className="w-4 h-4 text-gray-400" />
+                  </div>
+                )}
                 <p className="font-medium text-gray-700">{item.userData?.name || '—'}</p>
               </div>
 
@@ -54,11 +60,17 @@ const Appointment = () => {
 
               {/* Doctor */}
               <div className="flex items-center gap-2">
-                <img
-                  src={item.docData?.image || assets.doctor_icon}
-                  alt=""
-                  className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                />
+                {item.docData?.image ? (
+                  <img
+                    src={item.docData.image}
+                    alt=""
+                    className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                    <User className="w-4 h-4 text-gray-400" />
+                  </div>
+                )}
                 <div>
                   <p className="font-medium text-gray-700">{item.docData?.name || '—'}</p>
                   <p className="text-xs text-gray-400">{item.docData?.specialization}</p>
@@ -75,18 +87,21 @@ const Appointment = () => {
               {/* Status / Action */}
               <div>
                 {item.canceled ? (
-                  <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600 font-medium">Cancelled</span>
+                  <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600 font-medium mr-2">Cancelled</span>
                 ) : item.isCompleted ? (
-                  <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-600 font-medium">Done</span>
-                ) : (
-                  <button
-                    onClick={() => cancelAppointment(item._id)}
-                    className="p-1.5 hover:bg-red-50 rounded-full transition"
-                    title="Cancel"
-                  >
-                    <img src={assets.cancel_icon} alt="Cancel" className="w-6" />
-                  </button>
-                )}
+                  <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-600 font-medium mr-2">Done</span>
+                ) : null}
+                <button
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this appointment?')) {
+                      deleteAppointment(item._id)
+                    }
+                  }}
+                  className="p-1.5 hover:bg-red-50 rounded-full transition"
+                  title="Delete Appointment"
+                >
+                  <Trash2 className="w-5 h-5 text-red-500" />
+                </button>
               </div>
             </div>
           )) : (

@@ -2,17 +2,16 @@ import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { toast } from "react-hot-toast";
+import { toast } from "react-hot-toast"
 
 const Login = () => {
-
-  
   const [state, setState] = useState('Sign Up')
-  const {backendUrl, token, setToken} = useContext(AppContext)
+  const { backendUrl, token, setToken } = useContext(AppContext)
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
 
@@ -35,6 +34,7 @@ const Login = () => {
       }
     }
 
+    setLoading(true)
     try {
       if (state === 'Sign Up') {
         const { data } = await axios.post(backendUrl + '/api/user/register', {
@@ -65,53 +65,93 @@ const Login = () => {
     } catch (error) {
       const message = error.response?.data?.message || error.message
       toast.error(message)
+    } finally {
+      setLoading(false)
     }
   }
 
-  useEffect(()=>{
-    if(token) {
+  useEffect(() => {
+    if (token) {
       navigate('/')
     }
   }, [token])
 
-
   return (
-    <form onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center'>
-      <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-85 sm:min-w-96 border rounded-xl text-[#5E5E5E] text-sm shadow-lg'>
-        <p className='text-2xl font-semibold'>{state === 'Sign Up' ? 'Create Account' : 'Login'}</p>
-        <p>Please {state === 'Sign Up' ? 'sign up' : 'log in'} to book appointment</p>
-        {
-          state === 'Sign Up'
-            ? <div className='w-full '>
-              <p>Full Name</p>
-              <input className='border border-[#DADADA] rounded w-full p-2 mt-1' type="text" onChange={(e) => setName(e.target.value)} value={name} required />
-            </div>
-            : null
-        }
-        <div className='w-full'>
-          <p>Email</p>
-          <input className='border border-[#DADADA] rounded w-full p-2 mt-1' type="email" onChange={(e) => setEmail(e.target.value)} value={email} required />
+    <form onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center justify-center px-4'>
+      <div className='bg-white rounded-3xl border border-gray-100 shadow-xl p-8 sm:p-10 w-full max-w-md flex flex-col gap-6 transition-all hover:shadow-2xl'>
+        
+        {/* Header */}
+        <div className="text-center">
+          <h2 className='text-3xl font-extrabold text-gray-900'>{state === 'Sign Up' ? 'Create Account' : 'Welcome Back'}</h2>
+          <p className="text-xs text-gray-400 mt-2 font-light">
+            {state === 'Sign Up' ? 'Sign up to start booking your trusted doctors' : 'Log in to manage and view your medical bookings'}
+          </p>
         </div>
-        <div className='w-full '>
-          <p>Password</p>
-          <input
-            className='border border-[#DADADA] rounded w-full p-2 mt-1'
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            minLength={state === 'Sign Up' ? 8 : undefined}
-            required
-          />
+
+        {/* Inputs */}
+        <div className="flex flex-col gap-4">
           {state === 'Sign Up' && (
-            <p className='text-xs text-gray-400 mt-1'>Minimum 8 characters</p>
+            <div className='flex flex-col gap-1.5'>
+              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Full Name</label>
+              <input 
+                className='border border-gray-200 rounded-2xl w-full px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-gray-50 focus:bg-white transition-all font-medium' 
+                type="text" 
+                placeholder="Full name"
+                onChange={(e) => setName(e.target.value)} 
+                value={name} 
+                required 
+              />
+            </div>
+          )}
+
+          <div className='flex flex-col gap-1.5'>
+            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Email Address</label>
+            <input 
+              className='border border-gray-200 rounded-2xl w-full px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-gray-50 focus:bg-white transition-all font-medium' 
+              type="email" 
+              placeholder="example@mail.com"
+              onChange={(e) => setEmail(e.target.value)} 
+              value={email} 
+              required 
+            />
+          </div>
+
+          <div className='flex flex-col gap-1.5'>
+            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Password</label>
+            <input
+              className='border border-gray-200 rounded-2xl w-full px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-gray-50 focus:bg-white transition-all font-medium'
+              type="password"
+              placeholder="Enter strong password"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              minLength={state === 'Sign Up' ? 8 : undefined}
+              required
+            />
+            {state === 'Sign Up' && (
+              <span className='text-[10px] text-gray-400 font-light mt-0.5'>Minimum 8 characters containing letters & numbers</span>
+            )}
+          </div>
+        </div>
+
+        {/* CTA Button */}
+        <button 
+          type='submit' 
+          disabled={loading}
+          className='bg-primary text-white w-full py-3.5 rounded-2xl font-bold text-sm shadow-md hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50'
+        >
+          {loading && <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+          {state === 'Sign Up' ? 'Create Account' : 'Log In'}
+        </button>
+
+        {/* Switch Link */}
+        <div className="text-center text-xs text-gray-500 font-medium border-t pt-4">
+          {state === 'Sign Up' ? (
+            <p>Already have an account? <span onClick={() => setState('Login')} className='text-primary font-bold cursor-pointer hover:underline'>Login here</span></p>
+          ) : (
+            <p>New to FindMyDoctor? <span onClick={() => setState('Sign Up')} className='text-primary font-bold cursor-pointer hover:underline'>Create account</span></p>
           )}
         </div>
-        <button type='submit' className='bg-primary text-white w-full py-2 rounded-md text-base'>{state === 'Sign Up' ? 'Create account' : 'Login'}</button>
-        {
-          state === 'Sign Up'
-            ? <p>Already have an account? <span onClick={() => setState('Login')} className='text-primary underline cursor-pointer'>Login here</span></p>
-            : <p>Create an new account? <span onClick={() => setState('Sign Up')} className='text-primary underline cursor-pointer'>Click here</span></p>
-        }
+
       </div>
     </form>
   )

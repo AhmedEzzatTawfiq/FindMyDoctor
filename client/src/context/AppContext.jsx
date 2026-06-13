@@ -19,7 +19,14 @@ const AppContextProvider = (props) => {
         try {
             const {data} = await axios.get(backendUrl + '/api/doctor/list')
             if (data.success) {
-                setDoctors(data.doctors)
+                const normalized = data.doctors.map(doc => ({
+                    ...doc,
+                    speciality: doc.speciality || doc.specialization || 'General physician',
+                    title: doc.title || 'Specialist',
+                    gender: doc.gender || 'Male',
+                    slots_booked: doc.slots_booked || {}
+                }))
+                setDoctors(normalized)
             }
         } catch (error) {
             toast.error(error.message) 

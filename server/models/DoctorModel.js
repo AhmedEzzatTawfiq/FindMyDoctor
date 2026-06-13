@@ -53,6 +53,14 @@ const doctorSchema = mongoose.Schema({
     slots_booked: {
         type: Object,
         default: {}
+    },
+    gender: {
+        type: String,
+        default: "Male"
+    },
+    title: {
+        type: String,
+        default: "Specialist"
     }
 }, { minimize: false });
 

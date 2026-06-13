@@ -1,8 +1,9 @@
 import React, { useContext, useEffect } from 'react'
 import { AdminContext } from '../../context/AdminContext'
+import { Trash2 } from 'lucide-react'
 
 const DoctorList = () => {
-  const { doctors, getAllDoctors, aToken, changeAvailability } = useContext(AdminContext)
+  const { doctors, getAllDoctors, aToken, changeAvailability, deleteDoctor } = useContext(AdminContext)
 
   useEffect(() => {
     if (aToken) getAllDoctors()
@@ -21,8 +22,21 @@ const DoctorList = () => {
           {doctors.map((doc) => (
             <div
               key={doc._id}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 group"
+              className="relative bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 group"
             >
+              {/* Delete Button */}
+              <button
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this doctor?')) {
+                    deleteDoctor(doc._id)
+                  }
+                }}
+                className="absolute top-2 right-2 p-1.5 bg-white/80 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg shadow-sm backdrop-blur-sm transition-colors z-10"
+                title="Delete Doctor"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+
               {/* Photo */}
               <div className="bg-indigo-50 group-hover:bg-linear-to-br group-hover:from-indigo-100 group-hover:to-purple-100 transition-all duration-500 flex items-center justify-center h-36">
                 <img

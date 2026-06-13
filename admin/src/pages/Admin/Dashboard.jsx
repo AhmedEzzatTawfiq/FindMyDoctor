@@ -1,9 +1,10 @@
 import React, { useContext, useEffect } from 'react'
 import { AdminContext } from '../../context/AdminContext'
 import { assets } from '../../assets/assets'
+import { Stethoscope, CalendarCheck, Users, List, Trash2, User } from 'lucide-react'
 
 const Dashboard = () => {
-  const { aToken, dashData, getDashData, cancelAppointment } = useContext(AdminContext)
+  const { aToken, dashData, getDashData, deleteAppointment } = useContext(AdminContext)
 
   useEffect(() => {
     if (aToken) getDashData()
@@ -13,21 +14,21 @@ const Dashboard = () => {
     {
       label: 'Doctors',
       value: dashData?.doctors ?? '—',
-      icon: assets.doctor_icon,
+      icon: <Stethoscope className="w-8 h-8 text-white" />,
       color: 'from-indigo-500 to-indigo-400',
       bg: 'bg-indigo-50',
     },
     {
       label: 'Appointments',
       value: dashData?.appointments ?? '—',
-      icon: assets.appointments_icon,
+      icon: <CalendarCheck className="w-8 h-8 text-white" />,
       color: 'from-purple-500 to-purple-400',
       bg: 'bg-purple-50',
     },
     {
       label: 'Patients',
       value: dashData?.patients ?? '—',
-      icon: assets.patients_icon,
+      icon: <Users className="w-8 h-8 text-white" />,
       color: 'from-pink-500 to-pink-400',
       bg: 'bg-pink-50',
     },
@@ -46,7 +47,7 @@ const Dashboard = () => {
             className={`flex items-center gap-4 ${s.bg} p-5 rounded-2xl shadow-sm border border-white`}
           >
             <div className={`w-14 h-14 rounded-xl bg-linear-to-br ${s.color} flex items-center justify-center shadow`}>
-              <img src={s.icon} alt={s.label} className="w-7 h-7 brightness-[10]" />
+              {s.icon}
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-800">{s.value}</p>
@@ -59,7 +60,7 @@ const Dashboard = () => {
       {/* Recent Appointments */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-100">
-          <img src={assets.list_icon} alt="" className="w-5" />
+          <List className="w-5 h-5 text-gray-500" />
           <h3 className="text-lg font-semibold text-gray-700">Recent Appointments</h3>
         </div>
 
@@ -71,11 +72,17 @@ const Dashboard = () => {
                 className="flex items-center justify-between px-6 py-3 hover:bg-gray-50 transition"
               >
                 <div className="flex items-center gap-3">
-                  <img
-                    src={item.docData?.image || assets.doctor_icon}
-                    alt=""
-                    className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                  />
+                  {item.docData?.image ? (
+                    <img
+                      src={item.docData.image}
+                      alt=""
+                      className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                      <User className="w-5 h-5 text-gray-400" />
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm font-medium text-gray-800">Dr. {item.docData?.name}</p>
                     <p className="text-xs text-gray-400">{item.slotDate} · {item.slotTime}</p>
@@ -93,15 +100,17 @@ const Dashboard = () => {
                     {item.canceled ? 'Cancelled' : item.isCompleted ? 'Completed' : 'Upcoming'}
                   </span>
 
-                  {!item.canceled && !item.isCompleted && (
-                    <button
-                      onClick={() => cancelAppointment(item._id)}
-                      className="p-1.5 hover:bg-red-50 rounded-full transition"
-                      title="Cancel appointment"
-                    >
-                      <img src={assets.cancel_icon} alt="Cancel" className="w-5" />
-                    </button>
-                  )}
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to delete this appointment?')) {
+                        deleteAppointment(item._id)
+                      }
+                    }}
+                    className="p-1.5 hover:bg-red-50 rounded-full transition"
+                    title="Delete appointment"
+                  >
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                  </button>
                 </div>
               </div>
             ))

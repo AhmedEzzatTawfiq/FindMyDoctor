@@ -45,7 +45,9 @@ const addDoctor = async (req, res) => {
             about,
             fees,
             address,
-            degree
+            degree,
+            title,
+            gender
         } = req.body;
 
         const imageFile = req.file;
@@ -144,6 +146,8 @@ const addDoctor = async (req, res) => {
             address: parsedAddress,
             degree,
             image: imageUrl,
+            title: title || "Specialist",
+            gender: gender || "Male",
             date: Date.now()
         };
 
@@ -252,15 +256,15 @@ const getAllAppointments = async (req, res) => {
 };
 
 
-// API to cancel appointment (admin)
-const cancelAppointmentAdmin = async (req, res) => {
+// API to delete appointment (admin)
+const deleteAppointmentAdmin = async (req, res) => {
     try {
         const { appointmentId } = req.body;
         const Appointment = (await import('../models/appointmentModel.js')).default;
 
-        await Appointment.findByIdAndUpdate(appointmentId, { canceled: true });
+        await Appointment.findByIdAndDelete(appointmentId);
 
-        res.json({ success: true, message: 'Appointment cancelled' });
+        res.json({ success: true, message: 'Appointment deleted' });
     } catch (error) {
         console.log(error);
         res.status(500).json({ success: false, message: error.message });
@@ -294,11 +298,25 @@ const getDashboardData = async (req, res) => {
 };
 
 
+// API to delete a doctor
+const deleteDoctor = async (req, res) => {
+    try {
+        const { docId } = req.body;
+        await doctorModel.findByIdAndDelete(docId);
+        res.json({ success: true, message: 'Doctor deleted successfully' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
 export {
     addDoctor,
     adminLogin,
     getAllDoctors,
     getAllAppointments,
-    cancelAppointmentAdmin,
-    getDashboardData
+    deleteAppointmentAdmin,
+    getDashboardData,
+    deleteDoctor
 };

@@ -195,22 +195,11 @@ const CrmDashboard = ({ defaultTab = 'overview' }) => {
             Welcome{staffUser?.name ? `, ${staffUser.name}` : ''} — manage patients, sessions & payments
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={refreshAll}
-            className="text-sm flex gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition"
-          >
-          <RefreshCcw className='w-4 h-4 text-gray-500' /> Refresh
-          </button>
-          <div className="flex items-center gap-2 text-sm text-gray-500 bg-white border border-gray-100 rounded-xl px-4 py-2 shadow-sm">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            Staff Online
-          </div>
-        </div>
+      
       </div>
 
     
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {[
           { label: 'Add Patient', action: () => { navigate('/patients'); setShowPatientForm(true); } },
           { label: 'New Session', action: () => { navigate('/sessions'); setShowSessionForm(true); } },
@@ -226,7 +215,7 @@ const CrmDashboard = ({ defaultTab = 'overview' }) => {
             <p className="text-xs text-gray-400 mt-0.5">Quick action</p>
           </button>
         ))}
-      </div>
+      </div> */}
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -315,7 +304,7 @@ const CrmDashboard = ({ defaultTab = 'overview' }) => {
         </div>
       )}
 
-      {/* PATIENTS */}
+      {/* patients */}
       {activeTab === 'patients' && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 border-b border-gray-100">
@@ -392,7 +381,16 @@ const CrmDashboard = ({ defaultTab = 'overview' }) => {
                     <td className="px-4 py-3">{paymentBadge(p.paymentStatus)}</td>
                     <td className="px-4 py-3 text-gray-400">{fmtDate(p.createdAt)}</td>
                     <td className="px-4 py-3">
-                      <button onClick={() => deletePatient(p._id)} className="text-xs text-red-400 hover:text-red-600 border border-red-200 px-3 py-1 rounded-full">Remove</button>
+                      <button 
+                        onClick={() => {
+                          if (window.confirm('Are you sure you want to remove this patient?')) {
+                            deletePatient(p._id)
+                          }
+                        }} 
+                        className="text-xs text-red-400 hover:text-red-600 border border-red-200 px-3 py-1 rounded-full"
+                      >
+                        Remove
+                      </button>
                     </td>
                   </tr>
                 )) : (

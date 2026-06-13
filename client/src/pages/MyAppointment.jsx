@@ -1,17 +1,18 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { AppContext } from '../context/AppContext'
-import { toast } from "react-hot-toast";
-import axios from "axios";
+import { toast } from "react-hot-toast"
+import axios from "axios"
+import { Calendar, Check } from 'lucide-react'
 
 const MyAppointment = () => {
-
   const { backendUrl, token, getDoctors } = useContext(AppContext)
   const [appointments, setAppointments] = useState([])
+  const [loading, setLoading] = useState(true)
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
   const slotDateFormat = (slotDate) => {
     const dateArray = slotDate.split('-')
-    return `${dateArray[0]} - ${months[dateArray[1] - 1]} - ${dateArray[2]}`
+    return `${dateArray[0]} ${months[dateArray[1] - 1]} ${dateArray[2]}`
   }
 
   const cancelAppointment = async (appointmentId) => {
@@ -20,14 +21,13 @@ const MyAppointment = () => {
       if (data.success) {
         toast.success(data.message)
         getAppointments()
-        console.log(appointmentId)
         getDoctors()
       } else {
         toast.error(data.message)
       }
     } catch (error) {
       console.log(error)
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || error.message)
     }
   }
 
@@ -41,7 +41,7 @@ const MyAppointment = () => {
       }
     } catch (error) {
       console.log(error)
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || error.message)
     }
   }
 
@@ -57,24 +57,24 @@ const MyAppointment = () => {
       }
     } catch (error) {
       console.log(error)
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || error.message)
     }
   }
 
   const getAppointments = async () => {
+    setLoading(true)
     try {
-
       const { data } = await axios.get(backendUrl + '/api/user/appointments', { headers: { token } })
       if (data.success) {
         setAppointments(data.appointments.reverse())
-        console.log(data.appointments)
       } else {
         toast.error(data.message)
       }
-
     } catch (error) {
       console.log(error)
-      toast.error(error.message)
+      toast.error(error.response?.data?.message || error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -92,34 +92,102 @@ const MyAppointment = () => {
     }
   }, [token])
 
-
   return (
-    <div>
-      <p className='pb-3 mt-12 font-medium text-zinc-700 border-b'>My Appointments</p>
-      <div>
-        {appointments.slice(0, 3).map((item, index) => (
-          <div className='grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b' key={index}>
-            <div>
-              <img className='w-32 bg-indigo-50' src={item.docData.image} alt="" />
-            </div>
-            <div className='flex-1 text-sm text-zinc-600'>
-              <p className='text-neutral-800 font-semibold'>{item.docData.name}</p>
-              <p>{item.docData.speciality}</p>
-              <p className='text-zinc-700 font-medium mt-1'>Address:</p>
-              <p className='text-xs'>{item.docData.address.line1}</p>
-              <p className='text-xs'>{item.docData.address.line2}</p>
-              <p className='text-xs mt-1'><span className='text-sm text-neutral-700 font-medium'>Date & Time:</span> {slotDateFormat(item.slotDate)} | {slotDateFormat(item.slotTime)}</p>
-            </div>
-            <div></div>
-            <div className='flex flex-col gap-2 justify-end'>
-              {!item.canceled && item.payment && <button className='sm:min-w-48 py-2 border border-green-500 rounded text-green-500 bg-green-50' disabled>Paid</button>}
-              {!item.canceled && !item.payment && <button onClick={() => { paymentGateway(item._id) }} className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300'>Pay Online</button>}
-              {!item.canceled && <button onClick={() => { cancelAppointment(item._id) }} className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300'>Cancel appointment</button>}
-              {item.canceled && <p className='text-sm text-red-600 font-medium text-center sm:min-w-48 py-2 border border-red-200 rounded'>Appointment Cancelled !!</p>}
-            </div>
-          </div>
-        ))}
+    <div className="min-h-screen pb-20">
+      <div className="flex items-center justify-between border-b pb-4 mt-8">
+        <h2 className="text-xl font-bold text-gray-800">My Appointments</h2>
+        <span className="text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+          {appointments.length} Total Bookings
+        </span>
       </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 gap-3">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs text-gray-400 font-medium">Loading appointments...</p>
+        </div>
+      ) : appointments.length === 0 ? (
+        <div className="text-center py-20 border border-dashed rounded-2xl text-sm text-gray-400 font-semibold mt-6 flex flex-col items-center gap-3">
+          <Calendar className="w-10 h-10 text-gray-300" />
+          <span>You haven't booked any appointments yet.</span>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-5 mt-6">
+          {appointments.map((item, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-2xl border border-gray-100 shadow-xs p-5 flex flex-col md:flex-row gap-5 items-start md:items-center hover:shadow-sm transition-shadow duration-300"
+            >
+
+              {/* Doctor Avatar */}
+              <div className="w-24 h-24 rounded-xl overflow-hidden bg-indigo-50 border border-gray-100 shrink-0 self-center md:self-auto shadow-inner">
+                <img className="w-full h-full object-cover" src={item.docData.image} alt={item.docData.name} />
+              </div>
+
+              {/* Booking & Doctor Info */}
+              <div className="flex-1 text-xs text-gray-600 w-full">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-bold text-gray-900">{item.docData.name}</p>
+                  <span className="px-2 py-0.5 border border-gray-100 text-[10px] font-bold text-primary rounded-full bg-indigo-50/50 uppercase tracking-wider">
+                    {item.docData.specialization}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-bold text-gray-800">Clinic Address:</span>
+                  <p className="mt-0.5 font-light">fff{item.docData.address.line1}, {item.docData.address.line2}</p>
+                </div>
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 pt-1">
+                  <div>
+                    <span className="font-bold text-gray-800">Date & Time:</span>
+                    <p className="mt-0.5 font-medium text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-100/50 w-fit">
+                      {slotDateFormat(item.slotDate)} | {item.slotTime.toLowerCase()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Booking status label or CTA buttons */}
+              <div className="flex flex-col gap-2 shrink-0 w-full md:w-48 self-stretch justify-end border-t md:border-t-0 pt-4 md:pt-0">
+                {item.canceled ? (
+                  <div className="text-center py-2.5 px-4 border border-red-100 text-red-600 bg-red-50 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+                    Cancelled
+                  </div>
+                ) : item.payment ? (
+                  /* paid */
+                  <div className="flex flex-col items-center justify-center gap-2 py-3 px-4 bg-linear-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl">
+                    <div className="w-9 h-9 rounded-full bg-green-500 flex items-center justify-center shadow-md shadow-green-200">
+                      <Check className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-green-700 font-extrabold text-sm">Paid</p>
+                      <p className="text-green-500 text-[10px] font-medium mt-0.5">Payment Confirmed</p>
+                    </div>
+                  </div>
+                ) : (
+                  /* Not paied and not canceled */
+                  <>
+                    <button
+                      onClick={() => paymentGateway(item._id)}
+                      className="w-full bg-primary hover:bg-indigo-700 text-white font-bold text-xs py-2.5 rounded-xl shadow-sm transition-colors"
+                    >
+                      Pay Online
+                    </button>
+                    <button
+                      onClick={() => cancelAppointment(item._id)}
+                      className="w-full bg-white hover:bg-red-50 border border-gray-200 text-gray-500 hover:text-red-600 font-bold text-xs py-2.5 rounded-xl transition-all"
+                    >
+                      Cancel Appointment
+                    </button>
+                  </>
+                )}
+              </div>
+
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

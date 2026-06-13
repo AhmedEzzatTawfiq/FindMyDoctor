@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react'
 import { assets } from '../assets/assets'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext';
+import { BriefcaseMedical } from 'lucide-react';
 
 const Navbar = () => {
 
@@ -18,7 +19,14 @@ const Navbar = () => {
 
   return (
     <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-[#ADADAD]'>
-      <h1 onClick={() => navigate('/')} className="text-3xl font-bold text-primary drop-shadow-md cursor-pointer">Your Doctor</h1>
+      <div onClick={() => navigate('/')} className="flex items-center gap-2.5 cursor-pointer select-none">
+        <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-sm">
+          <BriefcaseMedical className='text-white' size={18} />
+        </div>
+        <h1 className="text-xl font-extrabold text-primary tracking-tight">
+          FindMyDoctor
+        </h1>
+      </div>
       <ul className='hidden md:flex items-start gap-5 font-medium'>
         <NavLink to='/'>
           <li className='py-1'>HOME</li>
@@ -36,7 +44,7 @@ const Navbar = () => {
           <li className='py-1'>CONTACT</li>
           <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
         </NavLink>
-        <button className='border px-5 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:bg-gray-50 transition-all'>Admin Panel</button>
+        <button onClick={() => window.open('http://localhost:5174', '_blank')} className='border px-5 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:bg-gray-50 transition-all'>Admin Panel</button>
       </ul>
 
 
@@ -62,7 +70,14 @@ const Navbar = () => {
         {/* ---- Mobile Menu ---- */}
         <div className={`md:hidden ${showMenu ? 'fixed w-full' : 'h-0 w-0'} right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}>
           <div className='flex items-center justify-between px-5 py-6'>
-            <h1 className="text-2xl font-bold text-primary drop-shadow-md">Your Doctor</h1>
+            <div className="flex items-center gap-2 select-none">
+              <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-xs">
+                <BriefcaseMedical className='text-white' size={16} />
+              </div>
+              <h1 className="text-lg font-bold text-primary">
+                FindMyDoctor
+              </h1>
+            </div>
             <img onClick={() => setShowMenu(false)} src={assets.cross_icon} className='w-7' alt="" />
           </div>
           <ul className='flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium'>

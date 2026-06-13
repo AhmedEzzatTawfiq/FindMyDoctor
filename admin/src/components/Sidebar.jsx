@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { AdminContext } from '../context/AdminContext'
 import { CrmContext } from '../context/CrmContext'
-import { ShieldPlus, UsersRound } from 'lucide-react'
+import { ShieldPlus, UsersRound, Home, CalendarCheck, UserPlus, Users, Stethoscope, NotebookTabs, CreditCard } from 'lucide-react'
 
 const Sidebar = () => {
   const { aToken } = useContext(AdminContext)
@@ -17,18 +17,18 @@ const Sidebar = () => {
     }`
 
   const adminLinks = [
-    { to: '/admin-dashboard', icon: assets.home_icon, label: 'Dashboard' },
-    { to: '/appointments', icon: assets.appointment_icon, label: 'Appointments' },
-    { to: '/add-doctor', icon: assets.add_icon, label: 'Add Doctor' },
-    { to: '/doctor-list', icon: assets.people_icon, label: 'Doctors List' },
+    { to: '/admin-dashboard', icon: <Home className="w-5 h-5 opacity-70" />, label: 'Dashboard' },
+    { to: '/appointments', icon: <CalendarCheck className="w-5 h-5 opacity-70" />, label: 'Appointments' },
+    { to: '/add-doctor', icon: <UserPlus className="w-5 h-5 opacity-70" />, label: 'Add Doctor' },
+    { to: '/doctor-list', icon: <Stethoscope className="w-5 h-5 opacity-70" />, label: 'Doctors List' },
   ]
 
   const staffLinks = [
-    { to: '/', icon: assets.home_icon, label: 'Overview' },
-    { to: '/patients', icon: assets.patients_icon, label: 'Patients' },
-    { to: '/sessions', icon: assets.appointment_icon, label: 'Sessions' },
-    { to: '/payments', icon: assets.earning_icon || assets.appointments_icon, label: 'Payments' },
-    { to: '/notes', icon: assets.list_icon, label: 'Notes' },
+    { to: '/', icon: <Home className="w-5 h-5 opacity-70" />, label: 'Overview' },
+    { to: '/patients', icon: <Users className="w-5 h-5 opacity-70" />, label: 'Patients' },
+    { to: '/sessions', icon: <CalendarCheck className="w-5 h-5 opacity-70" />, label: 'Sessions' },
+    { to: '/payments', icon: <CreditCard className="w-5 h-5 opacity-70" />, label: 'Payments' },
+    { to: '/notes', icon: <NotebookTabs className="w-5 h-5 opacity-70" />, label: 'Notes' },
   ]
 
   const links = aToken ? adminLinks : staffLinks
@@ -46,7 +46,7 @@ const Sidebar = () => {
       <nav className="flex flex-col gap-1">
         {links.map(({ to, icon, label }) => (
           <NavLink key={to} to={to} className={linkClass}>
-            <img src={icon} alt="" className="w-4 h-4 opacity-70" />
+            {icon}
             <span>{label}</span>
           </NavLink>
         ))}

@@ -120,11 +120,11 @@ const AdminLogin = () => {
                         </button>
 
                         {/* Demo credentials hint */}
-                        <div className="bg-indigo-50 rounded-xl p-3 text-xs text-indigo-700 border border-indigo-100">
+                        {/* <div className="bg-indigo-50 rounded-xl p-3 text-xs text-indigo-700 border border-indigo-100">
                             <p className="font-semibold mb-1">Demo Credentials</p>
                             <p>Admin: <span className="font-mono">admin</span> / <span className="font-mono">admin1234</span></p>
                             <p>Staff: <span className="font-mono">admin2</span> / <span className="font-mono">admin21234</span></p>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 

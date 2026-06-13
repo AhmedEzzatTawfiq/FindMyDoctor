@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { assets } from '../../assets/assets'
+import { UploadCloud } from 'lucide-react'
 import { AdminContext } from '../../context/AdminContext';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -27,6 +27,8 @@ const AddDoctor = () => {
   const [about, setAbout] = useState('');
   const [address1, setAddress1] = useState('');
   const [address2, setAddress2] = useState('');
+  const [title, setTitle] = useState('Specialist');
+  const [gender, setGender] = useState('Male');
   const [loading, setLoading] = useState(false);
 
   const { backendUrl, aToken } = useContext(AdminContext)
@@ -49,6 +51,8 @@ const AddDoctor = () => {
       formData.append('degree', degree)
       formData.append('about', about)
       formData.append('address', JSON.stringify({ line1: address1, line2: address2 }))
+      formData.append('title', title)
+      formData.append('gender', gender)
 
       const { data } = await axios.post(backendUrl + '/api/admin/add-doctor', formData, {
         headers: { aToken }
@@ -65,6 +69,8 @@ const AddDoctor = () => {
         setDegree('')
         setAbout('')
         setFees('')
+        setTitle('Specialist')
+        setGender('Male')
       } else {
         toast.error(data.message)
       }
@@ -87,7 +93,7 @@ const AddDoctor = () => {
             <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-dashed border-indigo-300 group-hover:border-indigo-500 transition flex items-center justify-center bg-indigo-50">
               {image
                 ? <img src={URL.createObjectURL(image)} alt="" className="w-full h-full object-cover" />
-                : <img src={assets.upload_area} alt="Upload" className="w-10 opacity-50" />
+                : <UploadCloud className="w-8 h-8 text-indigo-400" />
               }
             </div>
           </label>
@@ -135,6 +141,30 @@ const AddDoctor = () => {
               className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
             >
               {specializations.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-600">Doctor Title</label>
+            <select
+              value={title} onChange={(e) => setTitle(e.target.value)}
+              className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            >
+              <option value="Professor">Professor</option>
+              <option value="Lecturer">Lecturer</option>
+              <option value="Consultant">Consultant</option>
+              <option value="Specialist">Specialist</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-600">Gender</label>
+            <select
+              value={gender} onChange={(e) => setGender(e.target.value)}
+              className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            >
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
             </select>
           </div>
 
@@ -197,7 +227,7 @@ const AddDoctor = () => {
         <button
           type="submit"
           disabled={loading}
-          className="mt-6 bg-linear-to-r from-indigo-500 to-purple-600 text-white px-8 py-2.5 rounded-full font-semibold text-sm shadow hover:shadow-md hover:from-indigo-600 hover:to-purple-700 transition-all disabled:opacity-60 flex items-center gap-2"
+          className="mt-6 bg-linear-to-r cursor-pointer from-indigo-500 to-purple-600 text-white px-8 py-2.5 rounded-full font-semibold text-sm shadow hover:shadow-md hover:from-indigo-600 hover:to-purple-700 transition-all disabled:opacity-60 flex items-center gap-2"
         >
           {loading && <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
           {loading ? 'Adding…' : 'Add Doctor'}
