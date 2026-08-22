@@ -1,41 +1,28 @@
 import validator from "validator";
 import bcrypt from "bcrypt";
-import { v2 as cloudinary } from "cloudinary";
-import doctorModel from "../models/DoctorModel.js";
 import jwt from "jsonwebtoken";
 import streamifier from "streamifier";
+import { v2 as cloudinary } from "cloudinary";
 
+import doctorModel from "../models/DoctorModel.js";
+import Appointment from "../models/appointmentModel.js";
+import User from "../models/UserModel.js";
 
-// Helper function for Cloudinary upload
+// Cloudinary upload helper
 const streamUpload = (buffer) => {
-
     return new Promise((resolve, reject) => {
-
         const stream = cloudinary.uploader.upload_stream(
             { resource_type: "image" },
-
-            (error, result) => {
-
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            }
+            (error, result) => error ? reject(error) : resolve(result)
         );
 
-        streamifier
-            .createReadStream(buffer)
-            .pipe(stream);
+        streamifier.createReadStream(buffer).pipe(stream);
     });
 };
 
-
-// API for adding doctor
+// Add doctor
 const addDoctor = async (req, res) => {
-
     try {
-
         const {
             name,
             email,
@@ -52,89 +39,47 @@ const addDoctor = async (req, res) => {
 
         const imageFile = req.file;
 
-        // Check required fields
-        if (
-            !name ||
-            !email ||
-            !password ||
-            !specialization ||
-            !experience ||
-            !about ||
-            !fees ||
-            !address ||
-            !degree ||
-            !imageFile
-        ) {
-
+        if (!name || !email || !password || !specialization || !experience ||
+            !about || !fees || !address || !degree || !imageFile) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
             });
         }
 
-        // Validate email
-        if (!validator.isEmail(email)) {
+        if (!validator.isEmail(email))
+            return res.status(400).json({ success: false, message: "Invalid email" });
 
-            return res.status(400).json({
-                success: false,
-                message: "Invalid email"
-            });
-        }
-
-        // Validate password
-        if (password.length < 8) {
-
+        if (password.length < 8)
             return res.status(400).json({
                 success: false,
                 message: "Password must be at least 8 characters long"
             });
-        }
 
-        // Check if doctor already exists
         const existingDoctor = await doctorModel.findOne({ email });
 
-        if (existingDoctor) {
-
+        if (existingDoctor)
             return res.status(400).json({
                 success: false,
                 message: "Doctor already exists"
             });
-        }
 
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const result = await streamUpload(imageFile.buffer);
 
-        const hashedPassword = await bcrypt.hash(
-            password,
-            salt
-        );
-
-        // Upload image to Cloudinary
-        const result = await streamUpload(
-            imageFile.buffer
-        );
-
-        const imageUrl = result.secure_url;
-
-        // Safe address parsing
         let parsedAddress;
 
         try {
-
-            parsedAddress =
-                typeof address === "string"
-                    ? JSON.parse(address)
-                    : address;
-
-        } catch (error) {
-
+            parsedAddress = typeof address === "string"
+                ? JSON.parse(address)
+                : address;
+        } catch {
             return res.status(400).json({
                 success: false,
                 message: "Invalid address format"
             });
         }
 
-        // Doctor data
         const doctorData = {
             name,
             email,
@@ -145,16 +90,13 @@ const addDoctor = async (req, res) => {
             fees,
             address: parsedAddress,
             degree,
-            image: imageUrl,
+            image: result.secure_url,
             title: title || "Specialist",
             gender: gender || "Male",
             date: Date.now()
         };
 
-        // Save doctor
-        const newDoctor = new doctorModel(doctorData);
-
-        await newDoctor.save();
+        await doctorModel.create(doctorData);
 
         res.status(201).json({
             success: true,
@@ -162,89 +104,65 @@ const addDoctor = async (req, res) => {
         });
 
     } catch (error) {
-
         console.log(error);
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
-
-// API for admin login
+// Admin login
 const adminLogin = async (req, res) => {
-
     try {
-
         const { email, password } = req.body;
 
-        // Check credentials
-        if (
+        const isAdmin =
             email === process.env.ADMIN_EMAIL &&
-            password === process.env.ADMIN_PASSWORD
-        ) {
+            password === process.env.ADMIN_PASSWORD;
 
-            const token = jwt.sign(
-                { email },
-                process.env.JWT_SECRET,
-                { expiresIn: "7d" }
-            );
+        const isDemo =
+            email === process.env.DEMO_EMAIL &&
+            password === process.env.DEMO_PASSWORD;
 
-            return res.json({
-                success: true,
-                token
+        if (!isAdmin && !isDemo) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid credentials"
             });
         }
 
-        res.status(400).json({
-            success: false,
-            message: "Invalid credentials"
-        });
-
-    } catch (error) {
-
-        console.log(error);
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-};
-
-
-// API to get all doctors
-const getAllDoctors = async (req, res) => {
-
-    try {
-
-        const doctors = await doctorModel
-            .find({})
-            .select("-password");
+        const token = jwt.sign(
+            { email: process.env.ADMIN_EMAIL },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
 
         res.json({
             success: true,
-            doctors
+            token,
+            role: isDemo ? "demo" : "admin"
         });
 
     } catch (error) {
-
         console.log(error);
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
+// Get all doctors
+const getAllDoctors = async (req, res) => {
+    try {
+        const doctors = await doctorModel.find({}).select("-password");
 
-// API to get all appointments
+        res.json({ success: true, doctors });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Get all appointments
 const getAllAppointments = async (req, res) => {
     try {
-        const appointments = await (await import('../models/appointmentModel.js')).default
+        const appointments = await Appointment
             .find({})
             .sort({ date: -1 });
 
@@ -255,32 +173,29 @@ const getAllAppointments = async (req, res) => {
     }
 };
 
-
-// API to delete appointment (admin)
+// Delete appointment
 const deleteAppointmentAdmin = async (req, res) => {
     try {
         const { appointmentId } = req.body;
-        const Appointment = (await import('../models/appointmentModel.js')).default;
 
         await Appointment.findByIdAndDelete(appointmentId);
 
-        res.json({ success: true, message: 'Appointment deleted' });
+        res.json({
+            success: true,
+            message: "Appointment deleted"
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-
-// API to get dashboard summary
+// Get dashboard data
 const getDashboardData = async (req, res) => {
     try {
-        const Appointment = (await import('../models/appointmentModel.js')).default;
-        const User        = (await import('../models/UserModel.js')).default;
-
-        const doctors      = await doctorModel.countDocuments();
+        const doctors = await doctorModel.countDocuments();
         const appointments = await Appointment.countDocuments();
-        const patients     = await User.countDocuments();
+        const patients = await User.countDocuments();
 
         const latestAppointments = await Appointment
             .find({})
@@ -289,7 +204,12 @@ const getDashboardData = async (req, res) => {
 
         res.json({
             success: true,
-            dashData: { doctors, appointments, patients, latestAppointments }
+            dashData: {
+                doctors,
+                appointments,
+                patients,
+                latestAppointments
+            }
         });
     } catch (error) {
         console.log(error);
@@ -297,19 +217,22 @@ const getDashboardData = async (req, res) => {
     }
 };
 
-
-// API to delete a doctor
+// Delete doctor
 const deleteDoctor = async (req, res) => {
     try {
         const { docId } = req.body;
+
         await doctorModel.findByIdAndDelete(docId);
-        res.json({ success: true, message: 'Doctor deleted successfully' });
+
+        res.json({
+            success: true,
+            message: "Doctor deleted successfully"
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
 
 export {
     addDoctor,

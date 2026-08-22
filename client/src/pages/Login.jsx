@@ -18,10 +18,6 @@ const Login = () => {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
-    if (!backendUrl) {
-      toast.error('Backend URL is not configured. Set VITE_BACKEND_URL in client/.env')
-      return
-    }
 
     if (state === 'Sign Up') {
       if (!name.trim()) {

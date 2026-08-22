@@ -10,7 +10,6 @@ import Doctors from "./pages/Doctors";
 import Login from "./pages/Login";
 import MyAppointment from "./pages/MyAppointment";
 import About from "./pages/About";
-import AdminLogin from "./pages/AdminLogin";
 import toast, { Toaster } from 'react-hot-toast';
 
 const App = () => {
@@ -23,7 +22,6 @@ const App = () => {
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/doctors/:speciality" element={<Doctors />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/about" element={<About />} />
 
         <Route path="/contact" element={<Contact />} />

@@ -24,7 +24,7 @@ const DoctorList = () => {
               key={doc._id}
               className="relative bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 group"
             >
-              {/* Delete Button */}
+              {/* Delete Doctor */}
               <button
                 onClick={() => {
                   if (window.confirm('Are you sure you want to delete this doctor?')) {
@@ -38,11 +38,11 @@ const DoctorList = () => {
               </button>
 
               {/* Photo */}
-              <div className="bg-indigo-50 group-hover:bg-linear-to-br group-hover:from-indigo-100 group-hover:to-purple-100 transition-all duration-500 flex items-center justify-center h-36">
+              <div className="bg-indigo-50 group-hover:bg-linear-to-br group-hover:from-indigo-100 group-hover:to-purple-100 transition-all duration-500 flex items-center justify-center">
                 <img
                   src={doc.image}
                   alt={doc.name}
-                  className="h-full w-full object-cover"
+                  className=" object-contain"
                 />
               </div>
 
@@ -52,7 +52,7 @@ const DoctorList = () => {
                 <p className="text-xs text-indigo-500 mt-0.5">{doc.specialization}</p>
                 <p className="text-xs text-gray-400 mt-0.5">{doc.experience} experience</p>
 
-                {/* Availability toggle */}
+                {/* Availability */}
                 <label className="mt-3 flex items-center gap-2 cursor-pointer group/toggle">
                   <div className="relative">
                     <input

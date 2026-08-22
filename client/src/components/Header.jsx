@@ -12,7 +12,7 @@ const Header = () => {
     const [city, setCity] = useState('')
     const [searchName, setSearchName] = useState('')
 
-    // Extract unique cities/districts from doctors' addresses dynamically
+    // doctor's cities
     const availableCities = Array.from(
         new Set(
             doctors
@@ -46,12 +46,12 @@ const Header = () => {
                     Search from trusted medical professionals, select your preferred branch, and book appointments instantly.
                 </p>
 
-                {/* Unified Search Panel */}
+                {/* Search */}
                 <form
                     onSubmit={handleSearch}
                     className='w-full mt-8 bg-white/10 backdrop-blur-xl p-4 sm:p-5 rounded-2xl md:rounded-full border border-white/20 shadow-lg flex flex-col md:flex-row items-center gap-4 sm:gap-3'
                 >
-                    {/* Speciality Dropdown */}
+                    {/* Speciality */}
                     <div className='flex items-center gap-2.5 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-3 rounded-xl md:rounded-full w-full md:w-1/3 transition-all duration-300'>
                         <ClipboardList className="w-5 h-5 text-indigo-200 shrink-0" />
                         <select
@@ -69,7 +69,7 @@ const Header = () => {
                         </select>
                     </div>
 
-                    {/* City/Location Dropdown */}
+                    {/* City */}
                     <div className='flex items-center gap-2.5 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-3 rounded-xl md:rounded-full w-full md:w-1/3 transition-all duration-300'>
                         <MapPin className="w-5 h-5 text-indigo-200 shrink-0" />
                         <select
@@ -91,7 +91,7 @@ const Header = () => {
                         </select>
                     </div>
 
-                    {/* Doctor Name Input */}
+                    {/* Doctor Name */}
                     <div className='flex items-center gap-2.5 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-3 rounded-xl md:rounded-full w-full md:w-1/3 transition-all duration-300'>
                         <Search className="w-5 h-5 text-indigo-200 shrink-0" />
                         <input
@@ -103,7 +103,6 @@ const Header = () => {
                         />
                     </div>
 
-                    {/* Search CTA */}
                     <button
                         type="submit"
                         className='bg-white text-indigo-700 hover:bg-indigo-50 font-semibold px-8 py-3 rounded-xl md:rounded-full shrink-0 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 shadow-md w-full md:w-auto'
@@ -112,7 +111,6 @@ const Header = () => {
                     </button>
                 </form>
 
-                {/* Micro-profile avatars info */}
                 <div className='flex items-center gap-3 mt-6 text-sm font-light text-indigo-200'>
                     <img className='w-24' src={assets.group_profiles} alt="" />
                     <p>Over <span className="text-white font-medium">10,000+</span> patients booked their doctor appointments this week.</p>

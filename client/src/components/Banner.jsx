@@ -15,7 +15,6 @@ const Banner = () => {
         <section className='my-20 mx-4 md:mx-10'>
             <div className='relative bg-linear-to-br from-blue-600 via-indigo-600 to-indigo-800 rounded-3xl overflow-hidden px-8 md:px-16 py-14 md:py-20 shadow-2xl'>
 
-                {/* Background decorative blobs */}
                 <div className='absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none' />
                 <div className='absolute bottom-0 right-0 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none' />
                 <div className='absolute top-1/2 left-1/2 w-64 h-64 bg-blue-300/10 rounded-full blur-2xl -translate-x-1/2 -translate-y-1/2 pointer-events-none' />
@@ -45,7 +44,6 @@ const Banner = () => {
                             ))}
                         </div>
 
-                        {/* CTAs */}
                         <div className='flex items-center gap-4 mt-2 flex-wrap'>
                             <button
                                 onClick={() => { navigate('/doctors'); scrollTo(0, 0) }}

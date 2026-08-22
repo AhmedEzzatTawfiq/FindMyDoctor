@@ -42,10 +42,8 @@ const Footer = () => {
         <footer className='bg-linear-to-b from-white to-slate-50 border-t border-gray-100 mt-16'>
             <div className='max-w-7xl mx-auto px-6 md:px-10 py-14'>
 
-                {/* Top Row */}
                 <div className='flex flex-col sm:grid grid-cols-[2.5fr_1fr_1fr] gap-12 mb-12'>
 
-                    {/* Brand */}
                     <div className='flex flex-col gap-4'>
                         <div className="flex items-center gap-3 select-none">
                             <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-sm">
@@ -58,7 +56,6 @@ const Footer = () => {
                         <p className='text-gray-500 text-sm leading-relaxed max-w-sm'>
                             Your trusted partner in managing your healthcare needs — browse doctors, book appointments, and take charge of your health.
                         </p>
-                        {/* Social Icons */}
                         <div className='flex items-center gap-3 mt-2'>
                             {socialLinks.map(s => (
                                 <button key={s.name} title={s.name} className='w-8 h-8 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center'>
@@ -68,7 +65,6 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Quick Links */}
                     <div>
                         <p className='text-sm font-bold text-gray-800 uppercase tracking-wider mb-5'>Company</p>
                         <ul className='flex flex-col gap-2.5'>
@@ -87,7 +83,6 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Contact Info */}
                     <div>
                         <p className='text-sm font-bold text-gray-800 uppercase tracking-wider mb-5'>Get In Touch</p>
                         <ul className='flex flex-col gap-3'>
@@ -108,7 +103,6 @@ const Footer = () => {
 
                 </div>
 
-                {/* Divider & Bottom Row */}
                 <div className='border-t border-gray-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3'>
                     <p className='text-xs text-gray-400 text-center'>
                         © 2026 findmydoctor.com — All Rights Reserved.
