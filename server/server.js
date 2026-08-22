@@ -5,9 +5,6 @@ import connectCloudinary from "./configs/cloudinary.js";
 import adminRouter from "./routes/adminRoute.js";
 import doctorRouter from "./routes/doctorRoute.js";
 import userRouter from "./routes/userRoute.js";
-import crmRouter from "./routes/crmRoute.js";
-import staffRouter from "./routes/staffRoute.js";
-
 
 
 
@@ -52,7 +49,7 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS');
     res.setHeader(
         'Access-Control-Allow-Headers',
-        req.headers['access-control-request-headers'] || 'Content-Type, Authorization, token, atoken, stoken, dtoken'
+        req.headers['access-control-request-headers'] || 'Content-Type, Authorization, token, atoken'
     );
 
     if (req.method === 'OPTIONS') {
@@ -71,8 +68,7 @@ app.use((req, res, next) => {
 app.use("/api/admin", adminRouter);
 app.use("/api/doctor", doctorRouter);
 app.use("/api/user", userRouter);
-app.use("/api/crm", crmRouter);
-app.use("/api/staff", staffRouter);
+
 
 
 

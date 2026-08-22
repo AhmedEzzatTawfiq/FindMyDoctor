@@ -4,6 +4,10 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext';
 import { BriefcaseMedical } from 'lucide-react';
 
+const ADMIN_URL = import.meta.env.PROD
+  ? 'https://find-my-doctor-admin.vercel.app/'
+  : 'http://localhost:5174';
+
 const Navbar = () => {
 
   const navigate = useNavigate();
@@ -28,23 +32,19 @@ const Navbar = () => {
         </h1>
       </div>
       <ul className='hidden md:flex items-start gap-5 font-medium'>
-        <NavLink to='/'>
-          <li className='py-1'>HOME</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
+        <NavLink to='/' className={({ isActive }) => `py-1 ${isActive ? 'text-primary font-semibold border-b-2 border-primary' : ''}`}>
+          <li>HOME</li>
         </NavLink>
-        <NavLink to='/doctors'>
-          <li className='py-1'>ALL DOCTORS</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
+        <NavLink to='/doctors' className={({ isActive }) => `py-1 ${isActive ? 'text-primary font-semibold border-b-2 border-primary' : ''}`}>
+          <li>ALL DOCTORS</li>
         </NavLink>
-        <NavLink to='/about'>
-          <li className='py-1'>ABOUT</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
+        <NavLink to='/about' className={({ isActive }) => `py-1 ${isActive ? 'text-primary font-semibold border-b-2 border-primary' : ''}`}>
+          <li>ABOUT</li>
         </NavLink>
-        <NavLink to='/contact'>
-          <li className='py-1'>CONTACT</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
+        <NavLink to='/contact' className={({ isActive }) => `py-1 ${isActive ? 'text-primary font-semibold border-b-2 border-primary' : ''}`}>
+          <li>CONTACT</li>
         </NavLink>
-        <button onClick={() => window.open('http://localhost:5174', '_blank')} className='border px-5 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:bg-gray-50 transition-all'>Admin Panel</button>
+        <button onClick={() => window.open(ADMIN_URL, '_blank')} className='border px-5 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:bg-gray-50 transition-all'>Admin Panel</button>
       </ul>
 
 
@@ -65,11 +65,11 @@ const Navbar = () => {
             </div>
             : <button onClick={() => navigate('/login')} className='bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block'>Create account</button>
         }
-        <img onClick={() => setShowMenu(true)} className='w-6 md:hidden' src={assets.menu_icon} alt="" />
+        <img onClick={() => setShowMenu(true)} className='w-6 md:hidden cursor-pointer' src={assets.menu_icon} alt="" />
 
-        {/* ---- Mobile Menu ---- */}
+        {/* Dropdown Menu */}
         <div className={`md:hidden ${showMenu ? 'fixed w-full' : 'h-0 w-0'} right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}>
-          <div className='flex items-center justify-between px-5 py-6'>
+          <div className='flex items-center justify-between px-5 py-6 cursor-pointer'>
             <div className="flex items-center gap-2 select-none">
               <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-xs">
                 <BriefcaseMedical className='text-white' size={16} />

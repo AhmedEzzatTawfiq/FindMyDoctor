@@ -35,7 +35,7 @@ const About = () => {
     return (
         <div className='px-4 md:px-10'>
 
-            {/* ── Page Header ── */}
+            {/* Page Header  */}
             <div className='text-center pt-14 pb-4'>
                 <span className='text-xs font-semibold tracking-widest text-primary uppercase bg-primary/10 px-4 py-1.5 rounded-full'>
                     Who We Are
@@ -46,9 +46,9 @@ const About = () => {
                 <div className='w-12 h-1 bg-primary rounded-full mx-auto mt-3'></div>
             </div>
 
-            {/* ── Story Section ── */}
+            {/* Story Section */}
             <div className='my-14 flex flex-col md:flex-row items-center gap-12'>
-                {/* Image */}
+        
                 <div className='relative w-full md:max-w-sm lg:max-w-md shrink-0'>
                     <div className='absolute inset-0 bg-linear-to-br from-primary/20 to-indigo-200/40 rounded-3xl translate-x-4 translate-y-4'></div>
                     <img
@@ -56,7 +56,6 @@ const About = () => {
                         src={assets.about_image}
                         alt='About FindMyDoctor'
                     />
-                    {/* Floating card */}
                     <div className='absolute -bottom-5 -right-5 bg-white rounded-2xl shadow-lg px-5 py-4 flex items-center gap-3 border border-gray-100'>
                         <div className='w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center'>
                             <svg className='w-5 h-5 text-green-600' fill='currentColor' viewBox='0 0 20 20'>
@@ -70,7 +69,7 @@ const About = () => {
                     </div>
                 </div>
 
-                {/* Text Content */}
+
                 <div className='flex flex-col gap-6 md:flex-1'>
                     <h2 className='text-2xl md:text-3xl font-bold text-gray-900 leading-snug'>
                         Your trusted partner in managing<br className='hidden md:block' />
@@ -93,7 +92,7 @@ const About = () => {
                 </div>
             </div>
 
-            {/* ── Stats Strip ── */}
+
             <div className='bg-linear-to-r from-blue-600 via-indigo-600 to-indigo-800 rounded-3xl px-8 py-10 mb-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center relative overflow-hidden'>
                 <div className='absolute inset-0 bg-white/5 rounded-3xl pointer-events-none' />
                 {teamStats.map((s, i) => (
@@ -104,7 +103,6 @@ const About = () => {
                 ))}
             </div>
 
-            {/* ── Why Choose Us ── */}
             <div className='mb-24'>
                 <div className='text-center mb-10'>
                     <span className='text-xs font-semibold tracking-widest text-primary uppercase bg-primary/10 px-4 py-1.5 rounded-full'>
@@ -121,7 +119,7 @@ const About = () => {
                             key={i}
                             className='group relative bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-400 hover:-translate-y-1.5 overflow-hidden cursor-default'
                         >
-                            {/* Background gradient on hover */}
+                        
                             <div className={`absolute inset-0 bg-linear-to-br ${v.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-400 rounded-3xl`} />
 
                             <div className='relative z-10 flex flex-col gap-4'>

@@ -44,12 +44,9 @@ const Contact = () => {
                 </p>
             </div>
 
-            {/* ── Main Content ── */}
             <div className='my-14 flex flex-col lg:flex-row gap-12 mb-28'>
 
-                {/* Left: Image + Contact Info */}
                 <div className='flex flex-col gap-8 lg:w-5/12'>
-                    {/* Image */}
                     <div className='relative'>
                         <div className='absolute inset-0 bg-linear-to-br from-primary/20 to-indigo-200/40 rounded-3xl translate-x-3 translate-y-3'></div>
                         <img
@@ -59,7 +56,7 @@ const Contact = () => {
                         />
                     </div>
 
-                    {/* Info Cards */}
+
                     <div className='flex flex-col gap-4'>
                         {contactDetails.map((item, i) => (
                             <div key={i} className='flex items-start gap-4 bg-white border border-gray-100 rounded-2xl px-5 py-4 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300'>
@@ -77,7 +74,6 @@ const Contact = () => {
                 
                 </div>
 
-                {/* Right: Contact Form */}
                 <div className='lg:flex-1'>
                     <div className='bg-white rounded-3xl border border-gray-100 shadow-sm p-8 md:p-10 h-full'>
                         <h2 className='text-xl font-bold text-gray-900 mb-2'>Send us a message</h2>
@@ -104,7 +100,6 @@ const Contact = () => {
                                 />
                             </div>
 
-                            {/* Email */}
                             <div className='flex flex-col gap-1.5'>
                                 <label className='text-sm font-semibold text-gray-700'>Email Address</label>
                                 <input
@@ -117,7 +112,6 @@ const Contact = () => {
                                 />
                             </div>
 
-                            {/* Message */}
                             <div className='flex flex-col gap-1.5'>
                                 <label className='text-sm font-semibold text-gray-700'>Message</label>
                                 <textarea
@@ -130,7 +124,6 @@ const Contact = () => {
                                 />
                             </div>
 
-                            {/* Submit */}
                             <button
                                 type='submit'
                                 className='group bg-primary text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 mt-2'
@@ -140,7 +133,6 @@ const Contact = () => {
                             </button>
                         </form>
 
-                        {/* Social Links */}
                         <div className='flex items-center gap-4 mt-8 pt-6 border-t border-gray-100'>
                             <p className='text-xs text-gray-400 font-medium'>Also reach us on:</p>
                             {['Twitter', 'LinkedIn', 'Facebook'].map(s => (

@@ -57,7 +57,6 @@ const TopDoctors = () => {
                             </div>
                         </div>
 
-                        {/* Doctor Info */}
                         <div className='p-4'>
                             <p className='text-gray-900 font-semibold text-base leading-snug'>{item.name}</p>
                             <p className='text-primary text-xs font-medium mt-0.5'>{item.speciality}</p>
@@ -70,7 +69,7 @@ const TopDoctors = () => {
                 ))}
             </div>
 
-            {/* CTA */}
+
             <div className='flex justify-center mt-14'>
                 <button
                     onClick={() => { navigate('/doctors'); scrollTo(0, 0) }}
