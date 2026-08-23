@@ -8,10 +8,10 @@
     --primary: #5f6FFF;
 }
 
-
 * {
     font-family: "Outfit", sans-serif;
 }
+
 
 .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -27,7 +27,6 @@
 
 button {
     cursor: pointer;
-    /* transition: all 0.3s ease; */
 }
 
 @media (max-width: 640px) {
