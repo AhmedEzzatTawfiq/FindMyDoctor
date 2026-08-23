@@ -8,7 +8,6 @@ import Dashboard from './pages/Admin/Dashboard';
 import Appointment from './pages/Admin/Appointment';
 import AddDoctor from './pages/Admin/AddDoctor';
 import DoctorList from './pages/Admin/DoctorList';
-// import CrmDashboard from './pages/CrmDashboard';
 
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';

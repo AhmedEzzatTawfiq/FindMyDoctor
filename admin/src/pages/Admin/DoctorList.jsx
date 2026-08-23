@@ -3,17 +3,31 @@ import { AdminContext } from '../../context/AdminContext'
 import { Trash2 } from 'lucide-react'
 
 const DoctorList = () => {
-  const { doctors, getAllDoctors, aToken, changeAvailability, deleteDoctor } = useContext(AdminContext)
+  const { doctors, getAllDoctors, aToken, changeAvailability, deleteDoctor, loadingDoctors } = useContext(AdminContext)
 
   useEffect(() => {
-    if (aToken) getAllDoctors()
-  }, [aToken])
+    if (aToken && doctors.length === 0) getAllDoctors()
+  }, [aToken, doctors.length, getAllDoctors])
 
   return (
     <div className="m-5 w-full">
       <h2 className="text-2xl font-bold text-gray-700 mb-6">All Doctors</h2>
 
-      {doctors.length === 0 ? (
+      {loadingDoctors && doctors.length === 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 animate-pulse">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-xs">
+              <div className="h-44 bg-gray-200" />
+              <div className="p-4 space-y-2">
+                <div className="h-4 w-3/4 bg-gray-200 rounded" />
+                <div className="h-3 w-1/2 bg-gray-200 rounded" />
+                <div className="h-3 w-2/3 bg-gray-200 rounded" />
+                <div className="h-5 w-16 bg-gray-200 rounded-full mt-3" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : doctors.length === 0 ? (
         <div className="py-20 text-center text-gray-400 text-sm bg-white rounded-2xl shadow-sm border border-gray-100">
           No doctors found. Add a doctor to get started.
         </div>
@@ -38,11 +52,11 @@ const DoctorList = () => {
               </button>
 
               {/* Photo */}
-              <div className="bg-indigo-50 group-hover:bg-linear-to-br group-hover:from-indigo-100 group-hover:to-purple-100 transition-all duration-500 flex items-center justify-center">
+              <div className="bg-indigo-50 h-48 invert-0 group-hover:bg-linear-to-br group-hover:from-indigo-100 group-hover:to-purple-100 transition-all duration-500 flex items-center justify-center">
                 <img
                   src={doc.image}
                   alt={doc.name}
-                  className=" object-contain"
+                  className="object-cover h-full"
                 />
               </div>
 

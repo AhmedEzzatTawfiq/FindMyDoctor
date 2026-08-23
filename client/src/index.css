@@ -9,11 +9,11 @@
 }
 
 
-*{
+* {
     font-family: "Outfit", sans-serif;
 }
 
-.no-scrollbar::-webkit-scrollbar{
+.no-scrollbar::-webkit-scrollbar {
     display: none;
 }
 
@@ -25,7 +25,7 @@
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
-button{
+button {
     cursor: pointer;
     /* transition: all 0.3s ease; */
 }
