@@ -1,16 +1,25 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../../context/AppContext'
 import axios from "axios"
 import { toast } from "react-hot-toast"
 import ProfileSidebar from '../../components/ui/ProfileSidebar'
 import ProfileContactInfo from '../../components/ui/ProfileContactInfo'
 import ProfileBasicInfo from '../../components/ui/ProfileBasicInfo'
+import ProfileSkeleton from '../../components/ui/ProfileSkeleton'
 
 const Profile = () => {
-  const { userData, setUserData, token, backendUrl, getUserData } = useContext(AppContext)
+  const { userData, setUserData, token, backendUrl, getUserData, loadingUserData } = useContext(AppContext)
+  const navigate = useNavigate()
 
   const [isEdit, setIsEdit] = useState(false)
   const [image, setImage] = useState(false)
+
+  useEffect(() => {
+    if (!token && !loadingUserData) {
+      navigate('/login')
+    }
+  }, [token, loadingUserData, navigate])
 
   const updateUserData = async () => {
     try {
@@ -38,7 +47,12 @@ const Profile = () => {
     }
   }
 
-  return userData && (
+  // Show skeleton loader while user data is fetching on page load or refresh
+  if (loadingUserData || (token && !userData)) {
+    return <ProfileSkeleton />
+  }
+
+  return userData ? (
     <div className='max-w-4xl mx-auto my-10 px-4 md:px-6'>
       <div className='bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden transition-all duration-300'>
 
@@ -68,7 +82,7 @@ const Profile = () => {
 
       </div>
     </div>
-  )
+  ) : null
 }
 
 export default Profile

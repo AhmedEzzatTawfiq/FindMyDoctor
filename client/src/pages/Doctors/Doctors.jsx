@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AppContext } from '../../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
-import { Frown } from 'lucide-react'
+import { Frown, ChevronLeft, ChevronRight } from 'lucide-react'
 import DoctorFilters from '../../components/ui/DoctorFilters'
 import DoctorFilterModal from '../../components/ui/DoctorFilterModal'
 import DoctorCard from '../../components/ui/DoctorCard'
@@ -51,6 +51,14 @@ const Doctors = () => {
     )
   }, [doctors])
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 6
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedSpeciality, searchName, selectedCity, selectedGenders, selectedTitles, sortBy])
+
   // Filter + Sort by useMemo to prevent unnecessary calculations and rerenders
   const filteredDoctors = useMemo(() => {
     let result = [...doctors]
@@ -89,6 +97,20 @@ const Doctors = () => {
 
     return result
   }, [doctors, selectedSpeciality, searchName, selectedCity, selectedGenders, selectedTitles, sortBy])
+
+  const totalPages = Math.ceil(filteredDoctors.length / itemsPerPage)
+
+  const paginatedDoctors = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage
+    return filteredDoctors.slice(start, start + itemsPerPage)
+  }, [filteredDoctors, currentPage, itemsPerPage])
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   const toggleGender = (gender) => {
     setSelectedGenders(prev =>
@@ -287,7 +309,7 @@ const Doctors = () => {
                 <button onClick={clearFilters} className="text-xs font-bold text-primary hover:underline">Reset all filters</button>
               </div>
             ) : (
-              filteredDoctors.map((item) => (
+              paginatedDoctors.map((item) => (
                 <DoctorCard
                   key={item._id}
                   item={item}
@@ -302,6 +324,49 @@ const Doctors = () => {
               ))
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-xs">
+              <span className="text-xs font-medium text-gray-500">
+                Showing <strong className="text-gray-800">{(currentPage - 1) * itemsPerPage + 1}</strong> – <strong className="text-gray-800">{Math.min(currentPage * itemsPerPage, filteredDoctors.length)}</strong> of <strong className="text-gray-800">{filteredDoctors.length}</strong> doctors
+              </span>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer"
+                  aria-label="Previous Page"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      currentPage === page
+                        ? 'bg-primary text-white shadow-xs'
+                        : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer"
+                  aria-label="Next Page"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
 
         </div>
       </div>

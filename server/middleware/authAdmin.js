@@ -6,12 +6,12 @@ const authAdmin = async (req, res, next) => {
         const {atoken} = req.headers;
 
         if(!atoken){
-            return res.status(400).json({success:false, message:"Not authorized"})
+            return res.status(401).json({success:false, message:"Not authorized"})
         }
 
         const token_decode = jwt.verify(atoken, process.env.JWT_SECRET);
         if(token_decode.email !== process.env.ADMIN_EMAIL){
-            return res.status(400).json({success:false, message:"Not authorized"})
+            return res.status(401).json({success:false, message:"Not authorized"})
         }
 
         next();
@@ -19,7 +19,7 @@ const authAdmin = async (req, res, next) => {
         
     } catch (error) {
         console.log(error);
-        res.status(400).json({ success: false, message: error.message });
+        res.status(401).json({ success: false, message: error.message });
     }
 }
 
