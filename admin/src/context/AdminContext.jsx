@@ -1,114 +1,156 @@
 import { createContext, useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const AdminContext = createContext();
 
 const AdminContextProvider = (props) => {
-    const [aToken, setAToken] = useState(localStorage.getItem('aToken') ? localStorage.getItem('aToken') : '')
-
-    // Persistent state across refreshes
-    const [doctors, setDoctors] = useState(() => {
-        try {
-            const saved = sessionStorage.getItem('admin_doctors')
-            return saved ? JSON.parse(saved) : []
-        } catch { return [] }
-    })
-    const [appointments, setAppointments] = useState(() => {
-        try {
-            const saved = sessionStorage.getItem('admin_appointments')
-            return saved ? JSON.parse(saved) : []
-        } catch { return [] }
-    })
-    const [dashData, setDashData] = useState(() => {
-        try {
-            const saved = sessionStorage.getItem('admin_dashData')
-            return saved ? JSON.parse(saved) : null
-        } catch { return null }
-    })
-
-    const [loadingDash, setLoadingDash] = useState(false)
-    const [loadingDoctors, setLoadingDoctors] = useState(false)
-    const [loadingAppointments, setLoadingAppointments] = useState(false)
-
+    const [aToken, setATokenState] = useState(localStorage.getItem('aToken') ? localStorage.getItem('aToken') : '')
+    const queryClient = useQueryClient();
     const backendUrl = import.meta.env.VITE_BACKEND_URL
 
-    // Sync state to sessionStorage
-    useEffect(() => {
-        if (doctors.length > 0) {
-            sessionStorage.setItem('admin_doctors', JSON.stringify(doctors))
+    const setAToken = (newToken) => {
+        if (newToken) {
+            localStorage.setItem('aToken', newToken)
+            setATokenState(newToken)
+        } else {
+            localStorage.removeItem('aToken')
+            setATokenState('')
         }
-    }, [doctors])
+    }
 
+    // Cleanup legacy sessionStorage keys on init
     useEffect(() => {
-        if (appointments.length > 0) {
-            sessionStorage.setItem('admin_appointments', JSON.stringify(appointments))
-        }
-    }, [appointments])
+        sessionStorage.removeItem('admin_doctors')
+        sessionStorage.removeItem('admin_appointments')
+        sessionStorage.removeItem('admin_dashData')
+    }, [])
 
-    useEffect(() => {
-        if (dashData) {
-            sessionStorage.setItem('admin_dashData', JSON.stringify(dashData))
-        }
-    }, [dashData])
+    const logout = useCallback(() => {
+        localStorage.removeItem('aToken')
+        setATokenState('')
+        queryClient.clear()
+    }, [queryClient])
 
-    // Get all doctors
-    const getAllDoctors = useCallback(async () => {
-        if (!aToken) return
-        setLoadingDoctors(true)
-        try {
-            const { data } = await axios.get(backendUrl + '/api/admin/all-doctors', { headers: { aToken } })
-            if (data.success) {
-                setDoctors(data.doctors)
-            } else {
-                toast.error(data.message)
+    const handleAuthError = useCallback((error, message) => {
+        const errMsg = message || error?.response?.data?.message || error?.message
+        if (errMsg === 'jwt expired' || errMsg === 'Not authorized' || errMsg === 'jwt malformed' || error?.response?.status === 401) {
+            logout()
+            return true
+        }
+        return false
+    }, [logout])
+
+    // Query for Doctors List
+    const {
+        data: doctors = [],
+        isLoading: loadingDoctors,
+        refetch: getAllDoctors,
+    } = useQuery({
+        queryKey: ['admin', 'doctors', aToken],
+        queryFn: async () => {
+            if (!aToken) return []
+            try {
+                const { data } = await axios.get(backendUrl + '/api/admin/all-doctors', { headers: { aToken } })
+                if (data.success) {
+                    return data.doctors
+                } else {
+                    if (!handleAuthError(null, data.message)) toast.error(data.message)
+                    return []
+                }
+            } catch (error) {
+                if (!handleAuthError(error)) toast.error(error.message)
+                return []
             }
-        } catch (error) {
-            toast.error(error.message)
-        } finally {
-            setLoadingDoctors(false)
-        }
-    }, [aToken, backendUrl])
+        },
+        enabled: Boolean(aToken),
+        staleTime: 1000 * 60 * 5,
+    })
 
-    // Change doctor availbility
+    // Query for Appointments List
+    const {
+        data: appointments = [],
+        isLoading: loadingAppointments,
+        refetch: getAllAppointments,
+    } = useQuery({
+        queryKey: ['admin', 'appointments', aToken],
+        queryFn: async () => {
+            if (!aToken) return []
+            try {
+                const { data } = await axios.get(backendUrl + '/api/admin/appointments', { headers: { aToken } })
+                if (data.success) {
+                    return data.appointments
+                } else {
+                    if (!handleAuthError(null, data.message)) toast.error(data.message)
+                    return []
+                }
+            } catch (error) {
+                if (!handleAuthError(error)) toast.error(error.message)
+                return []
+            }
+        },
+        enabled: Boolean(aToken),
+        staleTime: 1000 * 60 * 5,
+    })
+
+    // Query for Dashboard Summary Data
+    const {
+        data: dashData = null,
+        isLoading: loadingDash,
+        refetch: getDashData,
+    } = useQuery({
+        queryKey: ['admin', 'dashData', aToken],
+        queryFn: async () => {
+            if (!aToken) return null
+            try {
+                const { data } = await axios.get(backendUrl + '/api/admin/dashboard', { headers: { aToken } })
+                if (data.success) {
+                    return data.dashData
+                } else {
+                    if (!handleAuthError(null, data.message)) toast.error(data.message)
+                    return null
+                }
+            } catch (error) {
+                if (!handleAuthError(error)) toast.error(error.message)
+                return null
+            }
+        },
+        enabled: Boolean(aToken),
+        staleTime: 1000 * 60 * 5,
+    })
+
+    // Change doctor availability
     const changeAvailability = async (docId) => {
-        setDoctors(prev => prev.map(d => d._id === docId ? { ...d, available: !d.available } : d))
+        queryClient.setQueryData(['admin', 'doctors', aToken], prev => {
+            if (!prev) return prev
+            return prev.map(d => d._id === docId ? { ...d, available: !d.available } : d)
+        })
         try {
             const { data } = await axios.post(backendUrl + '/api/admin/change-availability', { docId }, { headers: { aToken } })
             if (data.success) {
                 toast.success(data.message)
             } else {
-                toast.error(data.message)
-                getAllDoctors()
+                if (!handleAuthError(null, data.message)) {
+                    toast.error(data.message)
+                    getAllDoctors()
+                }
             }
         } catch (error) {
-            toast.error(error.message)
-            getAllDoctors()
+            if (!handleAuthError(error)) {
+                toast.error(error.message)
+                getAllDoctors()
+            }
         }
     }
 
-    // Get all appointments
-    const getAllAppointments = useCallback(async () => {
-        if (!aToken) return
-        setLoadingAppointments(true)
-        try {
-            const { data } = await axios.get(backendUrl + '/api/admin/appointments', { headers: { aToken } })
-            if (data.success) {
-                setAppointments(data.appointments)
-            } else {
-                toast.error(data.message)
-            }
-        } catch (error) {
-            toast.error(error.message)
-        } finally {
-            setLoadingAppointments(false)
-        }
-    }, [aToken, backendUrl])
-
     // Delete appointment admin
     const deleteAppointment = async (appointmentId) => {
-        setAppointments(prev => prev.filter(item => item._id !== appointmentId))
-        setDashData(prev => {
+        queryClient.setQueryData(['admin', 'appointments', aToken], prev => {
+            if (!prev) return prev
+            return prev.filter(item => item._id !== appointmentId)
+        })
+        queryClient.setQueryData(['admin', 'dashData', aToken], prev => {
             if (!prev) return prev
             return {
                 ...prev,
@@ -122,72 +164,58 @@ const AdminContextProvider = (props) => {
             if (data.success) {
                 toast.success(data.message)
             } else {
-                toast.error(data.message)
+                if (!handleAuthError(null, data.message)) {
+                    toast.error(data.message)
+                    getAllAppointments()
+                    getDashData()
+                }
+            }
+        } catch (error) {
+            if (!handleAuthError(error)) {
+                toast.error(error.message)
                 getAllAppointments()
                 getDashData()
             }
-        } catch (error) {
-            toast.error(error.message)
-            getAllAppointments()
-            getDashData()
         }
     }
 
-    // Get dashboard data
-    const getDashData = useCallback(async () => {
-        if (!aToken) return
-        setLoadingDash(true)
-        try {
-            const { data } = await axios.get(backendUrl + '/api/admin/dashboard', { headers: { aToken } })
-            if (data.success) {
-                setDashData(data.dashData)
-            } else {
-                toast.error(data.message)
-            }
-        } catch (error) {
-            toast.error(error.message)
-        } finally {
-            setLoadingDash(false)
-        }
-    }, [aToken, backendUrl])
-
-    // delete doctor
+    // Delete doctor admin
     const deleteDoctor = async (docId) => {
-        setDoctors(prev => prev.filter(doc => doc._id !== docId))
-        setDashData(prev => prev ? { ...prev, doctors: Math.max(0, (prev.doctors || 1) - 1) } : prev)
+        queryClient.setQueryData(['admin', 'doctors', aToken], prev => {
+            if (!prev) return prev
+            return prev.filter(doc => doc._id !== docId)
+        })
+        queryClient.setQueryData(['admin', 'dashData', aToken], prev => {
+            if (!prev) return prev
+            return { ...prev, doctors: Math.max(0, (prev.doctors || 1) - 1) }
+        })
 
         try {
             const { data } = await axios.post(backendUrl + '/api/admin/delete-doctor', { docId }, { headers: { aToken } })
             if (data.success) {
                 toast.success(data.message)
             } else {
-                toast.error(data.message)
-                getAllDoctors()
+                if (!handleAuthError(null, data.message)) {
+                    toast.error(data.message)
+                    getAllDoctors()
+                }
             }
         } catch (error) {
-            toast.error(error.message)
-            getAllDoctors()
+            if (!handleAuthError(error)) {
+                toast.error(error.message)
+                getAllDoctors()
+            }
         }
     }
 
-    // Background revalidation on authentication
     useEffect(() => {
-        if (aToken) {
-            getDashData()
-            getAllDoctors()
-            getAllAppointments()
-        } else {
-            sessionStorage.removeItem('admin_doctors')
-            sessionStorage.removeItem('admin_appointments')
-            sessionStorage.removeItem('admin_dashData')
-            setDoctors([])
-            setAppointments([])
-            setDashData(null)
+        if (!aToken) {
+            queryClient.removeQueries({ queryKey: ['admin'] })
         }
-    }, [aToken, getDashData, getAllDoctors, getAllAppointments])
+    }, [aToken, queryClient])
 
     const value = {
-        aToken, setAToken, backendUrl,
+        aToken, setAToken, backendUrl, logout,
         doctors, getAllDoctors, changeAvailability, deleteDoctor, loadingDoctors,
         appointments, getAllAppointments, deleteAppointment, loadingAppointments,
         dashData, getDashData, loadingDash,

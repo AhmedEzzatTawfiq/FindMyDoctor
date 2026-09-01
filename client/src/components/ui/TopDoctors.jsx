@@ -24,7 +24,7 @@ const TopDoctors = () => {
             {/* Doctors Grid / Skeleton */}
             {loadingDoctors && doctors.length === 0 ? (
                 <div className='w-full grid grid-cols-auto gap-5 pt-2 animate-pulse'>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                    {[1, 2, 3, 4, 5].map((i) => (
                         <div key={i} className='bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-xs'>
                             <div className='h-48 bg-gray-200' />
                             <div className='p-4 space-y-2'>
@@ -37,7 +37,7 @@ const TopDoctors = () => {
                 </div>
             ) : (
                 <div className='w-full grid grid-cols-auto gap-5 pt-2'>
-                    {doctors.slice(0, 10).map((item, index) => (
+                    {doctors.slice(0, 5).map((item, index) => (
                         <div
                             onClick={() => navigate(`/appointment/${item._id}`)}
                             key={index}

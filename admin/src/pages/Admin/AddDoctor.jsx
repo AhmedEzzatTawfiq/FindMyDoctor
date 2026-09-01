@@ -15,7 +15,10 @@ const specializations = [
 
 const experienceOptions = Array.from({ length: 10 }, (_, i) => `${i + 1} Year${i > 0 ? 's' : ''}`)
 
+import { useQueryClient } from '@tanstack/react-query';
+
 const AddDoctor = () => {
+  const queryClient = useQueryClient();
   const [image, setImage] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -60,6 +63,8 @@ const AddDoctor = () => {
 
       if (data.success) {
         toast.success(data.message)
+        queryClient.invalidateQueries({ queryKey: ['admin', 'doctors'] })
+        queryClient.invalidateQueries({ queryKey: ['admin', 'dashData'] })
         setImage(false)
         setName('')
         setEmail('')

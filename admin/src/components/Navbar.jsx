@@ -3,8 +3,11 @@ import { AdminContext } from '../context/AdminContext'
 import { useNavigate, useLocation, NavLink } from 'react-router-dom'
 import { BriefcaseMedical, Home, CalendarCheck, UserPlus, Stethoscope, LogOut, ChevronDown } from 'lucide-react'
 
+import { useQueryClient } from '@tanstack/react-query'
+
 const Navbar = () => {
   const { aToken, setAToken } = useContext(AdminContext)
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -13,7 +16,7 @@ const Navbar = () => {
   const logout = () => {
     setAToken('')
     localStorage.removeItem('aToken')
-    sessionStorage.clear()
+    queryClient.clear()
     setMobileMenuOpen(false)
     navigate('/')
   }
