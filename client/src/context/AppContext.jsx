@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
-import axios from "axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getDoctors as fetchDoctors, getUserProfile } from "../services";
 
 export const AppContext = createContext();
 
@@ -39,7 +39,7 @@ const AppContextProvider = (props) => {
     } = useQuery({
         queryKey: ['doctors'],
         queryFn: async () => {
-            const { data } = await axios.get(backendUrl + '/api/doctor/list')
+            const data = await fetchDoctors();
             if (data.success) {
                 return data.doctors.map(doc => ({
                     ...doc,
@@ -66,7 +66,7 @@ const AppContextProvider = (props) => {
         queryFn: async () => {
             if (!token) return false
             try {
-                const { data } = await axios.get(backendUrl + '/api/user/profile', { headers: { token } })
+                const data = await getUserProfile();
                 if (data.success) {
                     localStorage.setItem('userData', JSON.stringify(data.userData))
                     return data.userData

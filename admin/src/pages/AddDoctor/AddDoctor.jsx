@@ -2,7 +2,8 @@ import React, { useContext, useState } from 'react'
 import { UploadCloud } from 'lucide-react'
 import { AdminContext } from '../../context/AdminContext';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import { addDoctor } from '../../services';
+import { useQueryClient } from '@tanstack/react-query';
 
 const specializations = [
   'General physician',
@@ -14,8 +15,6 @@ const specializations = [
 ]
 
 const experienceOptions = Array.from({ length: 10 }, (_, i) => `${i + 1} Year${i > 0 ? 's' : ''}`)
-
-import { useQueryClient } from '@tanstack/react-query';
 
 const AddDoctor = () => {
   const queryClient = useQueryClient();
@@ -34,7 +33,7 @@ const AddDoctor = () => {
   const [gender, setGender] = useState('Male');
   const [loading, setLoading] = useState(false);
 
-  const { backendUrl, aToken } = useContext(AdminContext)
+  const { aToken } = useContext(AdminContext)
 
   const handleSubmit = async (e) => {
     e.preventDefault()   
@@ -57,9 +56,7 @@ const AddDoctor = () => {
       formData.append('title', title)
       formData.append('gender', gender)
 
-      const { data } = await axios.post(backendUrl + '/api/admin/add-doctor', formData, {
-        headers: { aToken }
-      })
+      const data = await addDoctor(formData);
 
       if (data.success) {
         toast.success(data.message)

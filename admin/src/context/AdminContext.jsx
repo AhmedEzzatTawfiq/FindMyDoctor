@@ -1,7 +1,14 @@
 import { createContext, useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+    getAllDoctors as fetchDoctorsApi,
+    getAllAppointments as fetchAppointmentsApi,
+    getAdminDashboard as fetchDashDataApi,
+    changeAvailability as changeAvailabilityApi,
+    deleteAppointment as deleteAppointmentApi,
+    deleteDoctor as deleteDoctorApi,
+} from "../services";
 
 export const AdminContext = createContext();
 
@@ -52,7 +59,7 @@ const AdminContextProvider = (props) => {
         queryFn: async () => {
             if (!aToken) return []
             try {
-                const { data } = await axios.get(backendUrl + '/api/admin/all-doctors', { headers: { aToken } })
+                const data = await fetchDoctorsApi()
                 if (data.success) {
                     return data.doctors
                 } else {
@@ -78,7 +85,7 @@ const AdminContextProvider = (props) => {
         queryFn: async () => {
             if (!aToken) return []
             try {
-                const { data } = await axios.get(backendUrl + '/api/admin/appointments', { headers: { aToken } })
+                const data = await fetchAppointmentsApi()
                 if (data.success) {
                     return data.appointments
                 } else {
@@ -104,7 +111,7 @@ const AdminContextProvider = (props) => {
         queryFn: async () => {
             if (!aToken) return null
             try {
-                const { data } = await axios.get(backendUrl + '/api/admin/dashboard', { headers: { aToken } })
+                const data = await fetchDashDataApi()
                 if (data.success) {
                     return data.dashData
                 } else {
@@ -127,7 +134,7 @@ const AdminContextProvider = (props) => {
             return prev.map(d => d._id === docId ? { ...d, available: !d.available } : d)
         })
         try {
-            const { data } = await axios.post(backendUrl + '/api/admin/change-availability', { docId }, { headers: { aToken } })
+            const data = await changeAvailabilityApi(docId)
             if (data.success) {
                 toast.success(data.message)
             } else {
@@ -160,7 +167,7 @@ const AdminContextProvider = (props) => {
         })
 
         try {
-            const { data } = await axios.post(backendUrl + '/api/admin/delete-appointment', { appointmentId }, { headers: { aToken } })
+            const data = await deleteAppointmentApi(appointmentId)
             if (data.success) {
                 toast.success(data.message)
             } else {
@@ -191,7 +198,7 @@ const AdminContextProvider = (props) => {
         })
 
         try {
-            const { data } = await axios.post(backendUrl + '/api/admin/delete-doctor', { docId }, { headers: { aToken } })
+            const data = await deleteDoctorApi(docId)
             if (data.success) {
                 toast.success(data.message)
             } else {
