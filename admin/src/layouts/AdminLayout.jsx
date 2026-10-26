@@ -12,7 +12,7 @@ const AdminLayout = ({ children }) => {
       <Navbar />
       <div className='flex items-start'>
         <Sidebar />
-        <main className='flex-1'>
+        <main className='flex-1 pr-10'>
           {children || <Outlet />}
         </main>
       </div>
